@@ -1,34 +1,60 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    Megaphone, PlusCircle, Pencil, Trash2,
-    Eye, EyeOff, Trophy, RefreshCw,
-    AlertTriangle, Info, ChevronLeft, ChevronRight,
-    CalendarDays
+    Megaphone, PlusCircle, Pencil, Trash2, Eye, EyeOff,
+    Trophy, RefreshCw, AlertTriangle, Info,
+    ChevronLeft, ChevronRight, CalendarDays, Sparkles
 } from 'lucide-react';
 
 const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }
+    hidden: { opacity: 0, y: 24, scale: 0.95 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: "easeOut" } }
 };
-const stagger = { show: { transition: { staggerChildren: 0.06 } } };
+
+const stagger = { show: { transition: { staggerChildren: 0.1 } } };
 
 const TYPE_CFG = {
-    winner:  { label: 'Pemenang',  icon: Trophy,        bg: 'bg-amber-100',   text: 'text-amber-700',   dot: 'bg-amber-400'   },
-    update:  { label: 'Update',    icon: RefreshCw,     bg: 'bg-blue-100',    text: 'text-blue-700',    dot: 'bg-blue-500'    },
-    warning: { label: 'Peringatan',icon: AlertTriangle, bg: 'bg-red-100',     text: 'text-red-700',     dot: 'bg-red-400'     },
-    info:    { label: 'Info',      icon: Info,          bg: 'bg-indigo-100',  text: 'text-indigo-700',  dot: 'bg-indigo-400'  },
+    winner: { 
+        label: 'Pemenang', 
+        icon: Trophy, 
+        bg: 'bg-gradient-to-r from-purple-500/10 to-indigo-500/10', 
+        text: 'text-purple-600', 
+        ring: 'ring-purple-200/50'
+    },
+    update: { 
+        label: 'Update', 
+        icon: RefreshCw, 
+        bg: 'bg-gradient-to-r from-indigo-500/10 to-blue-500/10', 
+        text: 'text-indigo-600', 
+        ring: 'ring-indigo-200/50'
+    },
+    warning: { 
+        label: 'Peringatan', 
+        icon: AlertTriangle, 
+        bg: 'bg-gradient-to-r from-orange-500/10 to-amber-500/10', 
+        text: 'text-orange-600', 
+        ring: 'ring-orange-200/50'
+    },
+    info: { 
+        label: 'Info', 
+        icon: Info, 
+        bg: 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10', 
+        text: 'text-blue-600', 
+        ring: 'ring-blue-200/50'
+    },
 };
 
-export default function AnnouncementsIndex({ announcements }) {
+const GRADIENT_BG = "bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50";
+
+export default function AnnouncementsIndex({ announcements = { data: [] } }) {
+
     function togglePublish(ann) {
-        const action = ann.is_published ? 'sembunyikan' : 'tayangkan';
-        if (confirm(`${action} pengumuman ini?`)) {
+        if (confirm('Ubah status pengumuman ini?')) {
             router.patch(
                 ann.is_published
                     ? route('admin.announcements.unpublish', ann.id)
-                    : route('admin.announcements.publish',   ann.id)
+                    : route('admin.announcements.publish', ann.id)
             );
         }
     }
@@ -43,300 +69,258 @@ export default function AnnouncementsIndex({ announcements }) {
         <AdminLayout header="Pengumuman">
             <Head title="Pengumuman" />
 
-            {/* ── Hero Banner ── */}
+            {/* HERO */}
             <motion.div
-                initial={{ opacity: 0, y: -16 }}
+                initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br
-                           from-slate-800 via-indigo-900 to-blue-900 p-6 mb-8 text-white">
-                <div className="absolute inset-0">
-                    <div className="absolute top-0 right-0 w-72 h-72 bg-white/5
-                                    rounded-full translate-x-1/3 -translate-y-1/3" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-400/10
-                                    rounded-full -translate-x-1/4 translate-y-1/4" />
-                </div>
-                <div className="relative z-10 flex justify-between items-center">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <Megaphone className="w-4 h-4 text-indigo-300" />
-                            <span className="text-indigo-300 text-sm font-medium">Panel Administrator</span>
+                className={`${GRADIENT_BG} rounded-3xl p-8 mb-8 shadow-2xl border border-white/50 backdrop-blur-sm`}>
+                
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl shadow-lg">
+                            <Megaphone className="w-6 h-6 text-white" />
                         </div>
-                        <h1 className="text-2xl font-black">Manajemen Pengumuman 📢</h1>
-                        <p className="text-slate-300 text-sm mt-1">
-                            Total{' '}
-                            <span className="font-bold text-white">{announcements.total}</span>
-                            {' '}pengumuman terdaftar.
-                        </p>
+                        <div>
+                            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 via-purple-600 to-indigo-700 bg-clip-text text-transparent">
+                                Manajemen Pengumuman
+                            </h1>
+                            <p className="text-purple-600/80 text-lg font-medium mt-1">
+                                Total <span className="font-black text-2xl text-indigo-600">{announcements?.total ?? 0}</span> pengumuman
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <motion.div
-                            animate={{ rotate: [0, 8, -4, 0], y: [0, -6, 0] }}
-                            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                            className="text-5xl hidden md:block">
-                            📢
-                        </motion.div>
-                        <Link
-                            href={route('admin.announcements.create')}
-                            className="flex items-center gap-2 bg-white text-indigo-700
-                                       font-bold text-sm px-4 py-2.5 rounded-2xl shadow-lg
-                                       hover:bg-indigo-50 hover:-translate-y-0.5 transition-all
-                                       duration-200 shrink-0">
-                            <PlusCircle className="w-4 h-4" />
-                            Buat Pengumuman
-                        </Link>
-                    </div>
+
+                    <Link 
+                        href={route('admin.announcements.create')}
+                        className="group flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-2xl hover:from-purple-700 hover:to-indigo-700 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 font-semibold text-lg">
+                        <PlusCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        Tambah Pengumuman
+                    </Link>
                 </div>
             </motion.div>
 
-            {/* ── Table Card ── */}
-            <motion.div
-                initial={{ opacity: 0, y: 24 }}
+            {/* TABLE CARD */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <Megaphone className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <h2 className="font-bold text-gray-800">Daftar Pengumuman</h2>
-                </div>
-
-                {/* Desktop Table */}
-                <div className="hidden md:block overflow-x-auto">
+                transition={{ delay: 0.2 }}
+                className={`${GRADIENT_BG} rounded-3xl shadow-2xl border border-white/50 backdrop-blur-sm overflow-hidden`}>
+                
+                <div className="p-1">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="bg-gray-50">
-                                {['Judul', 'Event', 'Tipe', 'Status', 'Tanggal', 'Aksi'].map(h => (
-                                    <th key={h} className="px-5 py-3.5 text-left text-xs font-bold
-                                                            text-gray-500 uppercase tracking-wider">
-                                        {h}
-                                    </th>
-                                ))}
+                            <tr className="bg-gradient-to-r from-purple-600/10 to-indigo-600/10 backdrop-blur-sm">
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Judul</th>
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Event</th>
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Tipe</th>
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Status</th>
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Tanggal</th>
+                                <th className="p-6 text-left font-semibold text-gray-700 tracking-wide">Aksi</th>
                             </tr>
                         </thead>
-                        <motion.tbody
-                            initial="hidden" animate="show" variants={stagger}
-                            className="divide-y divide-gray-50">
-                            {announcements.data.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6}>
-                                        <div className="flex flex-col items-center py-16 text-gray-400">
-                                            <motion.div animate={{ y: [0, -8, 0] }}
-                                                transition={{ duration: 3, repeat: Infinity }}
-                                                className="text-5xl mb-3">📭</motion.div>
-                                            <p className="text-sm">Belum ada pengumuman.</p>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                        <motion.tbody variants={stagger} initial="hidden" animate="show">
+                            {announcements?.data?.length === 0 ? (
+                                <EmptyState />
                             ) : (
-                                <AnimatePresence>
-                                    {announcements.data.map(ann => (
-                                        <AnnRow key={ann.id} ann={ann}
-                                            onToggle={() => togglePublish(ann)}
-                                            onDelete={() => destroy(ann.id)} />
-                                    ))}
-                                </AnimatePresence>
+                                announcements?.data?.map((ann, index) => (
+                                    <AnnouncementRow
+                                        key={ann.id}
+                                        ann={ann}
+                                        index={index}
+                                        onToggle={() => togglePublish(ann)}
+                                        onDelete={() => destroy(ann.id)}
+                                    />
+                                ))
                             )}
                         </motion.tbody>
                     </table>
                 </div>
 
-                {/* Mobile Cards */}
-                <div className="md:hidden p-4 space-y-3">
-                    {announcements.data.length === 0 ? (
-                        <div className="flex flex-col items-center py-12 text-gray-400">
-                            <div className="text-5xl mb-3">📭</div>
-                            <p className="text-sm">Belum ada pengumuman.</p>
-                        </div>
-                    ) : (
-                        <AnimatePresence>
-                            {announcements.data.map((ann, i) => (
-                                <AnnMobileCard key={ann.id} ann={ann} index={i}
-                                    onToggle={() => togglePublish(ann)}
-                                    onDelete={() => destroy(ann.id)} />
-                            ))}
-                        </AnimatePresence>
-                    )}
-                </div>
-
-                {/* Pagination */}
-                {announcements.last_page > 1 && (
-                    <div className="px-6 py-4 border-t border-gray-100 flex justify-between
-                                    items-center flex-wrap gap-3">
-                        <span className="text-xs text-gray-400 font-medium">
-                            Halaman{' '}
-                            <span className="text-gray-700 font-bold">{announcements.current_page}</span>
-                            {' '}dari{' '}
-                            <span className="text-gray-700 font-bold">{announcements.last_page}</span>
-                        </span>
-                        <div className="flex gap-2">
-                            {announcements.prev_page_url && (
-                                <Link href={announcements.prev_page_url}
-                                    className="flex items-center gap-1.5 px-4 py-2 border border-gray-200
-                                               rounded-2xl text-xs font-semibold text-gray-600
-                                               hover:border-indigo-300 hover:text-indigo-600
-                                               hover:-translate-y-0.5 transition-all duration-200
-                                               bg-white shadow-sm">
-                                    <ChevronLeft className="w-3.5 h-3.5" /> Sebelumnya
-                                </Link>
-                            )}
-                            {announcements.next_page_url && (
-                                <Link href={announcements.next_page_url}
-                                    className="flex items-center gap-1.5 px-4 py-2 border border-gray-200
-                                               rounded-2xl text-xs font-semibold text-gray-600
-                                               hover:border-indigo-300 hover:text-indigo-600
-                                               hover:-translate-y-0.5 transition-all duration-200
-                                               bg-white shadow-sm">
-                                    Selanjutnya <ChevronRight className="w-3.5 h-3.5" />
-                                </Link>
-                            )}
-                        </div>
-                    </div>
+                {/* PAGINATION */}
+                {announcements?.last_page > 1 && (
+                    <PaginationFooter announcements={announcements} />
                 )}
             </motion.div>
         </AdminLayout>
     );
 }
 
-/* ── Desktop Row ── */
-function AnnRow({ ann, onToggle, onDelete }) {
-    const cfg  = TYPE_CFG[ann.type] ?? TYPE_CFG.info;
-    const Icon = cfg.icon;
-
+/* EMPTY STATE */
+function EmptyState() {
     return (
-        <motion.tr variants={fadeUp}
-            className="hover:bg-indigo-50/30 transition-colors duration-150">
-            {/* Judul */}
-            <td className="px-5 py-4 max-w-[200px]">
-                <p className="font-bold text-gray-800 text-sm truncate">{ann.title}</p>
-                <p className="text-xs text-gray-400 mt-0.5 truncate">{ann.content}</p>
+        <tr>
+            <td colSpan={6} className="text-center p-20">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="p-8 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-3xl shadow-xl">
+                        <Megaphone className="w-16 h-16 text-purple-500 mx-auto" />
+                    </div>
+                    <div className="max-w-md mx-auto">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">Belum ada pengumuman</h3>
+                        <p className="text-gray-500 text-lg">Mulai buat pengumuman pertama Anda untuk memulai</p>
+                    </div>
+                </div>
             </td>
+        </tr>
+    );
+}
+
+/* ANNOUNCEMENT ROW */
+function AnnouncementRow({ ann, index, onToggle, onDelete }) {
+    return (
+        <motion.tr
+            variants={fadeUp}
+            className="border-b border-purple-100/50 hover:bg-white/60 backdrop-blur-sm transition-all duration-300 group">
+            
+            {/* Judul */}
+            <td className="p-6">
+                <div className="space-y-2">
+                    <h4 className="font-bold text-lg text-gray-800 group-hover:text-purple-700 transition-colors line-clamp-1">
+                        {ann.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-2 max-w-md">
+                        {ann.content}
+                    </p>
+                </div>
+            </td>
+
             {/* Event */}
-            <td className="px-5 py-4">
-                <span className="text-xs text-gray-500 font-medium">
-                    {ann.event?.title ?? <span className="text-gray-300">—</span>}
+            <td className="p-6">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-100/50 text-indigo-700 rounded-full text-sm font-medium">
+                    <Sparkles className="w-4 h-4" />
+                    {ann.event?.title ?? 'Umum'}
                 </span>
             </td>
+
             {/* Tipe */}
-            <td className="px-5 py-4">
+            <td className="p-6">
                 <TypeBadge type={ann.type} />
             </td>
+
             {/* Status */}
-            <td className="px-5 py-4">
-                <PublishBadge published={ann.is_published} />
+            <td className="p-6">
+                <PublishStatus published={ann.is_published} />
             </td>
+
             {/* Tanggal */}
-            <td className="px-5 py-4 text-xs text-gray-500">
-                {ann.published_at
-                    ? new Date(ann.published_at).toLocaleDateString('id-ID', {
-                        day: 'numeric', month: 'short', year: 'numeric'
-                      })
-                    : <span className="text-gray-300">—</span>}
+            <td className="p-6">
+                <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                    <CalendarDays className="w-4 h-4 text-purple-400" />
+                    {ann.published_at
+                        ? new Date(ann.published_at).toLocaleDateString('id-ID', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        })
+                        : 'Draft'}
+                </div>
             </td>
+
             {/* Aksi */}
-            <td className="px-5 py-4">
-                <ActionButtons ann={ann} onToggle={onToggle} onDelete={onDelete} />
+            <td className="p-6">
+                <ActionButtons
+                    ann={ann}
+                    onToggle={onToggle}
+                    onDelete={onDelete}
+                />
             </td>
         </motion.tr>
     );
 }
 
-/* ── Mobile Card ── */
-function AnnMobileCard({ ann, index, onToggle, onDelete }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.06 }}
-            className="p-4 rounded-2xl border border-gray-100 bg-gray-50/40
-                       hover:border-indigo-200 transition-colors duration-200">
-            <div className="flex justify-between items-start gap-2 mb-2">
-                <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-800 text-sm truncate">{ann.title}</p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">{ann.content}</p>
-                </div>
-                <PublishBadge published={ann.is_published} />
-            </div>
-            <div className="flex flex-wrap gap-2 mb-3">
-                <TypeBadge type={ann.type} />
-                {ann.event?.title && (
-                    <span className="flex items-center gap-1 text-xs text-gray-500 bg-white
-                                     border border-gray-100 px-2.5 py-1 rounded-full">
-                        <CalendarDays className="w-3 h-3" />
-                        {ann.event.title}
-                    </span>
-                )}
-                {ann.published_at && (
-                    <span className="text-xs text-gray-400">
-                        {new Date(ann.published_at).toLocaleDateString('id-ID', {
-                            day: 'numeric', month: 'short', year: 'numeric'
-                        })}
-                    </span>
-                )}
-            </div>
-            <ActionButtons ann={ann} onToggle={onToggle} onDelete={onDelete} mobile />
-        </motion.div>
-    );
-}
-
-/* ── Action Buttons ── */
-function ActionButtons({ ann, onToggle, onDelete, mobile }) {
-    const base = mobile
-        ? 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5'
-        : 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5';
+/* BADGE */
+function TypeBadge({ type }) {
+    const cfg = TYPE_CFG[type] || TYPE_CFG.info;
+    const Icon = cfg.icon;
 
     return (
-        <div className={`flex gap-2 ${mobile ? 'w-full' : ''}`}>
-            <Link href={route('admin.announcements.edit', ann.id)}
-                className={`${base} bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100`}>
-                <Pencil className="w-3.5 h-3.5" /> Edit
-            </Link>
-            <button onClick={onToggle}
-                className={`${base} border transition-all duration-200 hover:-translate-y-0.5
-                    ${ann.is_published
-                        ? 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'}`}>
-                {ann.is_published
-                    ? <><EyeOff className="w-3.5 h-3.5" /> Sembunyikan</>
-                    : <><Eye     className="w-3.5 h-3.5" /> Tayangkan</>}
-            </button>
-            <button onClick={onDelete}
-                className={`${base} bg-red-50 text-red-600 border border-red-100 hover:bg-red-100`}>
-                <Trash2 className="w-3.5 h-3.5" />
-                {mobile && ' Hapus'}
-            </button>
+        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl font-semibold shadow-sm ${cfg.bg} ${cfg.text} ${cfg.ring} backdrop-blur-sm border border-white/50 hover:scale-105 transition-all duration-200`}>
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            {cfg.label}
         </div>
     );
 }
 
-/* ── Type Badge ── */
-function TypeBadge({ type }) {
-    const cfg  = TYPE_CFG[type] ?? TYPE_CFG.info;
-    const Icon = cfg.icon;
+/* STATUS */
+function PublishStatus({ published }) {
     return (
-        <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1
-                          rounded-full ${cfg.bg} ${cfg.text}`}>
-            <Icon className="w-3 h-3" />
-            {cfg.label}
+        <span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl text-sm font-bold shadow-sm backdrop-blur-sm border border-white/50 transform transition-all duration-200 hover:scale-105
+            ${published 
+                ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-700 ring-2 ring-emerald-200/50' 
+                : 'bg-gradient-to-r from-slate-100/50 to-gray-100/50 text-gray-600 ring-2 ring-gray-200/50'
+            }`}>
+            {published ? (
+                <>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    Dipublikasikan
+                </>
+            ) : (
+                <>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    Draft
+                </>
+            )}
         </span>
     );
 }
 
-/* ── Publish Badge ── */
-function PublishBadge({ published }) {
-    return published ? (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1
-                          rounded-full bg-emerald-100 text-emerald-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            Tayang
-        </span>
-    ) : (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1
-                          rounded-full bg-gray-100 text-gray-500">
-            <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-            Draft
-        </span>
+/* ACTION */
+function ActionButtons({ ann, onToggle, onDelete }) {
+    return (
+        <div className="flex items-center gap-2">
+            <Link 
+                href={route('admin.announcements.edit', ann.id)}
+                className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-indigo-500/20 text-blue-700 rounded-2xl shadow-sm hover:shadow-md border border-blue-200/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 group">
+                <Pencil className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            </Link>
+
+            <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onToggle}
+                className="p-3 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 text-yellow-700 rounded-2xl shadow-sm hover:shadow-md border border-yellow-200/50 backdrop-blur-sm transition-all duration-300 group">
+                {ann.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </motion.button>
+
+            <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onDelete}
+                className="p-3 bg-gradient-to-br from-red-500/10 to-rose-500/10 hover:from-red-500/20 hover:to-rose-500/20 text-red-700 rounded-2xl shadow-sm hover:shadow-md border border-red-200/50 backdrop-blur-sm transition-all duration-300 group">
+                <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            </motion.button>
+        </div>
+    );
+}
+
+/* PAGINATION */
+function PaginationFooter({ announcements }) {
+    return (
+        <div className="px-8 py-6 bg-gradient-to-r from-purple-600/5 to-indigo-600/5 border-t border-purple-200/30 backdrop-blur-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <span className="text-sm font-medium text-gray-600">
+                    Halaman <span className="font-black text-purple-600">{announcements.current_page}</span> 
+                    dari <span className="font-black text-indigo-600">{announcements.last_page}</span>
+                </span>
+
+                <div className="flex items-center gap-2">
+                    {announcements.prev_page_url && (
+                        <Link 
+                            href={announcements.prev_page_url}
+                            className="flex items-center justify-center w-12 h-12 bg-white/70 hover:bg-white shadow-lg hover:shadow-xl rounded-2xl border border-purple-200/50 backdrop-blur-sm transition-all duration-300 hover:-translate-x-1 group">
+                            <ChevronLeft className="w-5 h-5 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                        </Link>
+                    )}
+                    
+                    {announcements.next_page_url && (
+                        <Link 
+                            href={announcements.next_page_url}
+                            className="flex items-center justify-center w-12 h-12 bg-white/70 hover:bg-white shadow-lg hover:shadow-xl rounded-2xl border border-purple-200/50 backdrop-blur-sm transition-all duration-300 hover:translate-x-1 group">
+                            <ChevronRight className="w-5 h-5 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                        </Link>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 }

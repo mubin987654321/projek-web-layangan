@@ -2,242 +2,152 @@ import JuryLayout from '@/Layouts/JuryLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, CheckCircle2, FileText, Save, ChevronRight, Sparkles, Zap } from 'lucide-react';
+import { FileText, Save, ChevronRight, Users, Award } from 'lucide-react';
 
-const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
-    id: i, left: `${(i * 337) % 100}%`, top: `${(i * 271) % 100}%`,
-    dur: 2.5 + (i % 4), delay: (i % 5) * 0.6, size: 2 + (i % 3),
-    color: ['#2dd4bf','#67e8f9','#34d399','#a5f3fc'][i % 4],
+const PARTICLES = Array.from({ length: 16 }, (_, i) => ({
+    id: i, left: `${(i * 397) % 100}%`, top: `${(i * 331) % 100}%`,
+    dur: 3 + (i % 5) * 0.3, delay: (i % 6) * 0.4, size: 2.5 + (i % 4),
+    color: ['#8b5cf6', '#7c3aed', '#6d28d9', '#5b21b6', '#4c1d95'][i % 5],
 }));
 
-const stagger = { show: { transition: { staggerChildren: 0.06 } } };
-const fadeUp  = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } } };
-
-/* ══ STAR RATING ══ */
-function StarRating({ value, max, onChange }) {
+/* ══ ENHANCED STAR RATING ══ */
+function StarRating({ value = 0, max, onChange }) {
     const [hover, setHover] = useState(null);
-    const stars = Math.min(max, 10); // cap visual stars at 10
-    const pct   = (hover ?? value) / max;
+    const pct = (hover ?? value) / max;
 
     return (
-        <div>
-            {/* Numeric input */}
-            <div className="flex items-center gap-3 mb-2">
-                <input
-                    type="number" min="0" max={max}
-                    value={value}
-                    onChange={e => onChange(Math.min(max, Math.max(0, Number(e.target.value))))}
-                    className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold
-                               text-center focus:outline-none focus:ring-2 focus:ring-teal-400
-                               focus:border-transparent transition-all duration-200"
-                />
-                <span className="text-xs text-gray-400">/ {max}</span>
-                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div
-                        animate={{ width: `${(value / max) * 100}%` }}
-                        transition={{ duration: 0.3 }}
-                        className="h-2 bg-gradient-to-r from-teal-400 to-cyan-500 rounded-full" />
+        <div className="space-y-3">
+            <div className="flex items-center gap-4">
+                <div className="flex-1 relative">
+                    <input
+                        type="number"
+                        min="0"
+                        max={max}
+                        value={value}
+                        onMouseEnter={() => setHover(value)}
+                        onMouseLeave={() => setHover(null)}
+                        onChange={e => onChange(Math.min(max, Math.max(0, Number(e.target.value) || 0)))}
+                        className="w-full border-2 border-purple-200/60 bg-gradient-to-r from-white/70 to-slate-50/70 backdrop-blur-sm rounded-2xl 
+                                   px-5 py-3 text-lg font-bold text-center focus:outline-none 
+                                   focus:border-purple-400 focus:ring-4 focus:ring-purple-100/60 
+                                   focus:shadow-2xl hover:shadow-xl transition-all duration-400 shadow-lg"
+                    />
                 </div>
-                <span className={`text-xs font-black tabular-nums
-                    ${pct >= 0.8 ? 'text-emerald-600' : pct >= 0.5 ? 'text-teal-600' : 'text-amber-500'}`}>
+                <span className="text-sm font-bold text-slate-400 bg-gradient-to-r from-slate-800/60 to-purple-900/60 px-3 py-2 rounded-xl backdrop-blur-sm">/ {max}</span>
+
+                <div className="flex-1">
+                    <div className="h-3 bg-gradient-to-r from-slate-200/50 to-purple-200/30 rounded-2xl overflow-hidden shadow-inner">
+                        <motion.div
+                            animate={{ width: `${(value / max) * 100}%` }}
+                            transition={{ duration: 0.4 }}
+                            className="h-3 bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 
+                                       rounded-2xl shadow-lg"
+                        />
+                    </div>
+                </div>
+
+                <div className={`text-lg font-black tabular-nums px-4 py-2 rounded-2xl bg-gradient-to-r from-slate-800/80 to-purple-900/80 backdrop-blur-sm shadow-lg
+                                 ${pct >= 0.8 ? 'text-emerald-500 shadow-emerald-200/50'
+                                    : pct >= 0.5 ? 'text-purple-400 shadow-purple-200/50'
+                                    : 'text-amber-400 shadow-amber-200/50'}`}>
                     {Math.round(pct * 100)}%
-                </span>
+                </div>
             </div>
         </div>
     );
 }
 
-export default function ScoringShow({ event, submissions, criteria }) {
-    const [selected, setSelected] = useState(null);
-
-    return (
-        <JuryLayout header={`Penilaian: ${event.title}`}>
-            <Head title="Penilaian Karya" />
-
-            {/* ── HERO BANNER ── */}
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
-                className="relative overflow-hidden rounded-3xl mb-8
-                           bg-gradient-to-br from-slate-900 via-teal-950 to-cyan-950
-                           p-6 text-white shadow-2xl shadow-teal-950/40">
-                <div className="absolute inset-0 opacity-[0.08]" style={{
-                    backgroundImage: `linear-gradient(rgba(45,212,191,0.5) 1px, transparent 1px),
-                                      linear-gradient(90deg, rgba(45,212,191,0.5) 1px, transparent 1px)`,
-                    backgroundSize: '40px 40px',
-                }} />
-                <motion.div className="absolute w-56 h-56 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, #2dd4bf 0%, transparent 70%)', top: '-20%', right: '-5%', opacity: 0.18 }}
-                    animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} />
-                {PARTICLES.map(p => (
-                    <motion.div key={p.id} className="absolute rounded-full pointer-events-none"
-                        style={{ width: p.size, height: p.size, background: p.color, left: p.left, top: p.top }}
-                        animate={{ y: [0, -18, 0], opacity: [0.2, 0.8, 0.2] }}
-                        transition={{ duration: p.dur, repeat: Infinity, delay: p.delay }} />
-                ))}
-                <div className="relative z-10 flex justify-between items-center gap-4">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <Zap className="w-3.5 h-3.5 text-teal-300" />
-                            <span className="text-teal-300 text-xs font-semibold">Penilaian Karya</span>
-                        </div>
-                        <h1 className="text-xl font-black text-white leading-tight max-w-lg truncate">
-                            {event.title}
-                        </h1>
-                        <p className="text-slate-300 text-xs mt-1">
-                            {submissions.length} karya · {criteria.length} kriteria penilaian
-                        </p>
-                    </div>
-                    <motion.div animate={{ rotate: [0, 8, -4, 0] }} transition={{ duration: 5, repeat: Infinity }}
-                        className="hidden sm:block text-5xl shrink-0">⚖️</motion.div>
-                </div>
-            </motion.div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* ── SUBMISSION LIST ── */}
-                <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
-                    className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-
-                    <div className="relative overflow-hidden px-6 py-4 border-b border-gray-100
-                                    bg-gradient-to-r from-teal-600 to-cyan-600">
-                        <div className="absolute inset-0 opacity-10" style={{
-                            backgroundImage: `linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
-                                              linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)`,
-                            backgroundSize: '24px 24px',
-                        }} />
-                        <div className="relative flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                                <motion.div animate={{ rotate: [0, 10, -6, 0] }} transition={{ duration: 4, repeat: Infinity }}
-                                    className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <FileText className="w-4 h-4 text-white" />
-                                </motion.div>
-                                <div>
-                                    <h2 className="font-black text-white text-sm">Karya Peserta</h2>
-                                    <p className="text-teal-200 text-[10px]">Klik untuk pilih karya yang akan dinilai</p>
-                                </div>
-                            </div>
-                            <span className="bg-white/20 border border-white/30 text-white text-xs
-                                             font-bold px-2.5 py-1 rounded-full">
-                                {submissions.filter(s => s.my_scores_count > 0).length}/{submissions.length} dinilai
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="p-4 space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto">
-                        {submissions.length === 0 ? (
-                            <div className="text-center py-12 text-gray-400">
-                                <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}
-                                    className="text-5xl mb-3">📭</motion.div>
-                                <p className="text-sm">Belum ada karya yang dikirim.</p>
-                            </div>
-                        ) : (
-                            <AnimatePresence>
-                                {submissions.map((sub, i) => (
-                                    <SubmissionCard key={sub.id} sub={sub} index={i}
-                                        isSelected={selected?.id === sub.id}
-                                        onSelect={() => setSelected(sub)} />
-                                ))}
-                            </AnimatePresence>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* ── SCORE FORM ── */}
-                <div>
-                    <AnimatePresence mode="wait">
-                        {selected ? (
-                            <motion.div key={selected.id}
-                                initial={{ opacity: 0, x: 24, scale: 0.98 }}
-                                animate={{ opacity: 1, x: 0, scale: 1 }}
-                                exit={{ opacity: 0, x: -24, scale: 0.98 }}
-                                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-                                <ScoreForm submission={selected} criteria={criteria} event={event} />
-                            </motion.div>
-                        ) : (
-                            <motion.div key="empty"
-                                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                className="hidden lg:flex bg-white rounded-3xl shadow-sm border-2
-                                           border-dashed border-teal-200 items-center justify-center
-                                           text-center p-12 h-full min-h-[300px]">
-                                <div>
-                                    <motion.div animate={{ y: [0, -8, 0], rotate: [0, 5, -3, 0] }}
-                                        transition={{ duration: 4, repeat: Infinity }}
-                                        className="text-5xl mb-4">📝</motion.div>
-                                    <p className="font-bold text-gray-600 mb-1">Pilih Karya</p>
-                                    <p className="text-sm text-gray-400">
-                                        Pilih karya di sebelah kiri untuk mulai memberikan penilaian
-                                    </p>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-        </JuryLayout>
-    );
-}
-
-/* ══ SUBMISSION CARD ══ */
+/* ══ ENHANCED SUBMISSION CARD ══ */
 function SubmissionCard({ sub, index, isSelected, onSelect }) {
     const isScored = sub.my_scores_count > 0;
+
     return (
         <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.04 }}
+            transition={{ delay: index * 0.08 }}
             onClick={onSelect}
-            whileHover={{ x: 3 }}
-            whileTap={{ scale: 0.99 }}
-            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200
+            whileHover={{ x: 6, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`p-6 rounded-3xl border-2 cursor-pointer transition-all duration-500 backdrop-blur-xl shadow-xl
+                        group hover:shadow-3xl hover:shadow-purple-300/40
                         ${isSelected
-                            ? 'border-teal-400 bg-teal-50/60 shadow-md shadow-teal-100'
-                            : 'border-gray-100 bg-white hover:border-teal-200 hover:shadow-sm'}`}>
-
-            <div className="flex items-start gap-3">
-                {/* Avatar */}
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm
-                                 font-bold text-white shrink-0 shadow-sm
-                                 ${isSelected
-                                     ? 'bg-gradient-to-br from-teal-400 to-cyan-500'
-                                     : 'bg-gradient-to-br from-gray-300 to-gray-400'}`}>
-                    {sub.registration?.user?.name?.charAt(0).toUpperCase() ?? '?'}
-                </div>
+                            ? 'border-purple-400/70 bg-gradient-to-br from-purple-500/10 to-indigo-600/10 shadow-3xl shadow-purple-300/50 ring-4 ring-purple-100/50'
+                            : 'border-slate-700/40 bg-gradient-to-br from-slate-800/80 to-slate-900/60 hover:border-purple-400/50 hover:bg-purple-500/5'
+                        }`}
+        >
+            <div className="flex items-start gap-5">
+                <motion.div
+                    animate={{
+                        scale: isSelected ? [1, 1.1, 1] : 1,
+                        rotate: isSelected ? [0, 180, 360] : 0
+                    }}
+                    transition={{ duration: isSelected ? 2 : 0, repeat: isSelected ? Infinity : 0 }}
+                    className={`w-16 h-16 rounded-3xl flex items-center justify-center text-lg font-black 
+                               text-white shrink-0 shadow-2xl ring-4 ring-white/30 backdrop-blur-xl
+                               ${isSelected
+                                   ? 'bg-gradient-to-br from-purple-500 via-indigo-600 to-purple-600 shadow-purple-400/60'
+                                   : 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-slate-400/40 hover:shadow-purple-400/50'
+                               }`}
+                >
+                    {sub.registration?.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
+                </motion.div>
 
                 <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-800 text-sm truncate">{sub.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">
-                        {sub.registration?.user?.name}
-                        <span className="mx-1.5 text-gray-300">·</span>
-                        {sub.registration?.category?.name}
+                    <h4 className="font-black text-xl text-slate-100 leading-tight truncate drop-shadow-sm mb-2">
+                        {sub.title || 'Untitled'}
+                    </h4>
+                    <p className="text-base text-slate-300 font-semibold truncate mb-3 backdrop-blur-sm">
+                        {sub.registration?.user?.name || 'Unknown'}
                     </p>
+                    <div className="flex items-center gap-3 text-sm">
+                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r 
+                                        from-purple-500/20 to-indigo-600/20 text-purple-200 border-2 border-purple-400/40
+                                        rounded-2xl font-bold backdrop-blur-xl shadow-lg">
+                            <Users className="w-4 h-4" />
+                            {sub.registration?.category?.name || 'Uncategorized'}
+                        </span>
+                    </div>
                 </div>
 
                 {isSelected && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 300 }}>
-                        <ChevronRight className="w-4 h-4 text-teal-500 shrink-0" />
+                    <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 400 }}
+                        className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-3xl 
+                                   flex items-center justify-center text-white shadow-2xl ring-4 ring-white/40 ml-auto"
+                    >
+                        <ChevronRight className="w-6 h-6" />
                     </motion.div>
                 )}
             </div>
 
-            <div className="mt-2.5">
-                <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1
-                                  rounded-full font-semibold border
-                                  ${isScored
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                      : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                    <motion.span animate={{ scale: isScored ? [1,1.3,1] : 1 }}
-                        transition={{ duration: 1.5, repeat: isScored ? Infinity : 0 }}
-                        className={`w-1.5 h-1.5 rounded-full ${isScored ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                    {isScored ? `Sudah Dinilai (${sub.my_scores_count})` : 'Belum Dinilai'}
-                </span>
-            </div>
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`mt-5 inline-flex items-center gap-2.5 text-base px-6 py-3 rounded-3xl font-bold 
+                           border-2 shadow-xl backdrop-blur-xl transition-all duration-500
+                           ${isScored
+                               ? 'bg-gradient-to-r from-emerald-500/15 to-teal-600/15 text-emerald-300 border-emerald-400/40 shadow-emerald-300/40'
+                               : 'bg-gradient-to-r from-amber-500/15 to-orange-600/15 text-amber-300 border-amber-400/40 shadow-amber-300/40'
+                           }`}
+            >
+                <motion.span
+                    animate={{ scale: isScored ? [1, 1.4, 1] : 1 }}
+                    transition={{ duration: 1.5, repeat: isScored ? Infinity : 0 }}
+                    className={`w-3 h-3 rounded-full shadow-lg
+                               ${isScored ? 'bg-emerald-500 shadow-emerald-400/50' : 'bg-amber-500 shadow-amber-400/50'}`}
+                />
+                {isScored ? `Sudah Dinilai (${sub.my_scores_count})` : 'Belum Dinilai'}
+            </motion.div>
         </motion.div>
     );
 }
 
-/* ══ SCORE FORM ══ */
+/* ══ PREMIUM SCORE FORM ══ */
 function ScoreForm({ submission, criteria, event }) {
-    const { data, setData, post, processing, wasSuccessful } = useForm({
+    const { data, setData, post, processing } = useForm({
         scores: criteria.map(c => ({
             criteria_id: c.id,
             score: 0,
@@ -245,134 +155,388 @@ function ScoreForm({ submission, criteria, event }) {
         })),
     });
 
-    function submit(e) {
+    const submit = (e) => {
         e.preventDefault();
         post(route('jury.submissions.score', submission.id));
-    }
+    };
 
     const totalWeighted = criteria.reduce((sum, c, i) => {
-        return sum + (Number(data.scores[i]?.score) || 0) * c.weight;
+        return sum + (Number(data.scores[i]?.score) || 0) * (c.weight || 1);
     }, 0);
-    const maxWeighted = criteria.reduce((sum, c) => sum + c.max_score * c.weight, 0);
-    const overallPct  = maxWeighted > 0 ? Math.round((totalWeighted / maxWeighted) * 100) : 0;
+    const maxWeighted = criteria.reduce((sum, c) => sum + (c.max_score || 10) * (c.weight || 1), 0);
+    const overallPct = maxWeighted > 0 ? Math.round((totalWeighted / maxWeighted) * 100) : 0;
 
     return (
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <motion.div
+            initial={{ scale: 0.98, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-purple-900/80 backdrop-blur-2xl rounded-3xl shadow-4xl shadow-purple-500/30 
+                       border border-purple-500/40 overflow-hidden h-full flex flex-col"
+        >
+            <div className="h-2 w-full bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 shadow-lg" />
 
-            {/* Top accent */}
-            <div className="h-1 w-full bg-gradient-to-r from-teal-400 to-cyan-500" />
-
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-100">
-                <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl
-                                    flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0">
-                        {submission.registration?.user?.name?.charAt(0).toUpperCase()}
+            <div className="px-8 py-8 border-b border-slate-700/50 shadow-lg">
+                <div className="flex items-start gap-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 via-indigo-600 to-purple-600 
+                                    rounded-3xl flex items-center justify-center text-white font-black text-2xl 
+                                    shadow-3xl ring-8 ring-white/30 shrink-0 backdrop-blur-xl">
+                        {submission.registration?.user?.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h2 className="font-black text-gray-800 text-base leading-tight truncate">
-                            {submission.title}
+                        <h2 className="font-black text-3xl text-slate-100 leading-tight truncate drop-shadow-2xl mb-3">
+                            {submission.title || 'Untitled'}
                         </h2>
-                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{submission.description}</p>
+                        <p className="text-xl text-slate-300 font-semibold line-clamp-3 backdrop-blur-sm shadow-lg">
+                            {submission.description || 'No description available'}
+                        </p>
                     </div>
                 </div>
 
-                {/* Preview image */}
                 {submission.photo_url && (
                     <motion.img
-                        initial={{ opacity: 0, scale: 0.97 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         src={`/storage/${submission.photo_url}`}
                         alt="Foto karya"
-                        className="rounded-2xl mt-4 w-full object-cover max-h-48
-                                   border border-teal-100 shadow-sm hover:shadow-md
-                                   hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+                        className="rounded-3xl mt-8 w-full object-cover h-64 shadow-2xl hover:shadow-3xl
+                                   border-4 border-purple-500/40 hover:border-purple-400/60
+                                   hover:scale-[1.02] transition-all duration-500 cursor-zoom-in bg-gradient-to-br 
+                                   from-slate-800/70 to-purple-900/40 backdrop-blur-xl"
                     />
                 )}
 
-                {/* Overall score preview */}
-                <div className="mt-4 flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <motion.div animate={{ width: `${overallPct}%` }} transition={{ duration: 0.4 }}
-                            className={`h-2 rounded-full bg-gradient-to-r
-                                        ${overallPct >= 80 ? 'from-emerald-400 to-teal-500'
-                                                           : 'from-teal-400 to-cyan-500'}`} />
+                <div className="mt-8 flex items-center gap-5 p-5 bg-gradient-to-r from-slate-800/60 to-purple-900/40 
+                                rounded-3xl backdrop-blur-xl shadow-xl border border-purple-500/30">
+                    <div className="flex-1">
+                        <div className="h-4 bg-gradient-to-r from-slate-700/50 to-purple-700/30 rounded-2xl overflow-hidden shadow-inner">
+                            <motion.div
+                                animate={{ width: `${overallPct}%` }}
+                                transition={{ duration: 0.6 }}
+                                className={`h-4 rounded-2xl shadow-xl bg-gradient-to-r
+                                            ${overallPct >= 80 ? 'from-emerald-500 via-teal-500 to-emerald-600 shadow-emerald-400/60'
+                                               : 'from-purple-500 via-indigo-600 to-purple-600 shadow-purple-400/60'}`}
+                            />
+                        </div>
                     </div>
-                    <span className={`text-xs font-black tabular-nums
-                        ${overallPct >= 80 ? 'text-emerald-600' : 'text-teal-600'}`}>
+                    <div className={`text-2xl font-black tabular-nums px-6 py-3 rounded-3xl bg-gradient-to-r from-slate-800/90 to-purple-900/90 
+                                    backdrop-blur-xl shadow-2xl ring-4 ring-white/30
+                                    ${overallPct >= 80 ? 'text-emerald-400 shadow-emerald-300/50'
+                                       : 'text-purple-300 shadow-purple-300/50'}`}>
                         {overallPct}%
-                    </span>
-                    <span className="text-xs text-gray-400">skor tertimbang</span>
+                    </div>
+                    <span className="text-lg font-bold text-slate-300 backdrop-blur-sm">skor tertimbang</span>
                 </div>
             </div>
 
-            {/* Criteria form */}
-            <form onSubmit={submit} className="p-6 space-y-4">
-                {criteria.map((criterion, i) => (
-                    <motion.div key={criterion.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.06 }}
-                        className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50
-                                   hover:border-teal-200 hover:bg-teal-50/20 transition-all duration-200">
-                        <label className="block text-xs font-black text-gray-700 mb-0.5 uppercase tracking-wide">
-                            {criterion.name}
-                        </label>
-                        <p className="text-[10px] text-gray-400 mb-3">
-                            Nilai maks: <span className="font-bold text-teal-600">{criterion.max_score}</span>
-                            &nbsp;· Bobot: <span className="font-bold text-cyan-600">{criterion.weight}×</span>
-                        </p>
+            <div className="flex-1 p-8 space-y-6 overflow-y-auto custom-scrollbar">
+                <form onSubmit={submit}>
+                    {criteria.map((criterion, i) => (
+                        <motion.div
+                            key={criterion.id}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.12 }}
+                            className="p-8 rounded-3xl border-2 border-purple-500/30 bg-gradient-to-br 
+                                       from-slate-800/70 to-purple-900/40 backdrop-blur-xl shadow-2xl hover:shadow-3xl
+                                       hover:border-purple-400/50 hover:shadow-purple-400/40 transition-all duration-500
+                                       group"
+                        >
+                            <div className="flex items-start justify-between mb-6">
+                                <div>
+                                    <label className="block text-xl font-black text-slate-100 uppercase tracking-wider 
+                                                      drop-shadow-lg mb-2">
+                                        {criterion.name}
+                                    </label>
+                                    <p className="text-lg text-slate-300 font-semibold backdrop-blur-sm">
+                                        Maks: <span className="text-purple-400 font-black">{criterion.max_score || 10}</span>
+                                        &nbsp;· Bobot: <span className="text-indigo-400 font-black">{criterion.weight || 1}×</span>
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 
+                                                rounded-2xl flex items-center justify-center text-white font-bold 
+                                                shadow-xl ring-4 ring-white/30 group-hover:scale-110 transition-all">
+                                    {i + 1}
+                                </div>
+                            </div>
 
-                        <StarRating
-                            value={Number(data.scores[i]?.score) || 0}
-                            max={criterion.max_score}
-                            onChange={(val) => {
-                                const scores = [...data.scores];
-                                scores[i] = { ...scores[i], score: val };
-                                setData('scores', scores);
-                            }}
-                        />
+                            <StarRating
+                                value={Number(data.scores[i]?.score) || 0}
+                                max={criterion.max_score || 10}
+                                onChange={(val) => {
+                                    const scores = [...data.scores];
+                                    scores[i] = { ...scores[i], score: val };
+                                    setData('scores', scores);
+                                }}
+                            />
 
-                        <textarea
-                            placeholder="Komentar opsional..."
-                            value={data.scores[i]?.comment}
-                            onChange={e => {
-                                const scores = [...data.scores];
-                                scores[i] = { ...scores[i], comment: e.target.value };
-                                setData('scores', scores);
-                            }}
-                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 mt-2
-                                       text-xs focus:ring-2 focus:ring-teal-400 focus:border-transparent
-                                       focus:bg-white outline-none transition-all duration-200
-                                       placeholder:text-gray-300 resize-none bg-white"
-                            rows={2} />
-                    </motion.div>
+                            <textarea
+                                placeholder="Tulis komentar detail untuk kriteria ini (opsional)..."
+                                value={data.scores[i]?.comment || ''}
+                                onChange={e => {
+                                    const scores = [...data.scores];
+                                    scores[i] = { ...scores[i], comment: e.target.value };
+                                    setData('scores', scores);
+                                }}
+                                className="w-full border-2 border-purple-500/40 bg-gradient-to-r from-slate-800/80 to-purple-900/60 backdrop-blur-xl rounded-3xl 
+                                           px-6 py-5 mt-6 text-lg font-semibold focus:ring-4 focus:ring-purple-100/50 
+                                           focus:border-purple-400 focus:shadow-3xl hover:shadow-xl transition-all 
+                                           duration-400 shadow-lg resize-vertical placeholder:text-slate-400 
+                                           placeholder:italic min-h-[100px]"
+                            />
+                        </motion.div>
+                    ))}
+
+                    <motion.button
+                        type="submit"
+                        disabled={processing}
+                        whileHover={!processing ? { scale: 1.05, y: -3 } : {}}
+                        whileTap={!processing ? { scale: 0.95 } : {}}
+                        className="w-full flex items-center justify-center gap-4 bg-gradient-to-r
+                                   from-purple-600 via-indigo-700 to-purple-700 text-white py-6 rounded-3xl 
+                                   font-black text-xl shadow-3xl shadow-purple-500/50 hover:shadow-4xl
+                                   hover:shadow-purple-600/60 hover:from-purple-500 hover:via-indigo-600 
+                                   hover:to-purple-600 transition-all duration-500 border-2 border-white/30
+                                   backdrop-blur-xl disabled:opacity-50 disabled:cursor-not-allowed 
+                                   disabled:transform-none mt-8"
+                    >
+                        {processing ? (
+                            <>
+                                <div className="w-7 h-7 border-2 border-white/40 border-t-white rounded-2xl animate-spin shadow-2xl" />
+                                <span>Menyimpan Penilaian...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-6 h-6" />
+                                <span>Simpan Penilaian Final</span>
+                            </>
+                        )}
+                    </motion.button>
+                </form>
+            </div>
+        </motion.div>
+    );
+}
+
+export default function ScoringShow({ event, submissions, criteria = [] }) {
+    const [selected, setSelected] = useState(null);
+
+    return (
+        <JuryLayout header={`Penilaian: ${event?.title || 'Event'}`}>
+            <Head title="Penilaian Karya" />
+
+            <motion.div
+                initial={{ opacity: 0, y: -25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="relative overflow-hidden rounded-3xl mb-10 shadow-3xl shadow-purple-950/60
+                           bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900
+                           p-10 text-white border border-purple-800/50 backdrop-blur-xl"
+            >
+                <div
+                    className="absolute inset-0 opacity-[0.06]"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(139,92,246,0.3) 1px, transparent 1px),
+                                          linear-gradient(90deg, rgba(139,92,246,0.3) 1px, transparent 1px)`,
+                        backgroundSize: '50px 50px',
+                    }}
+                />
+
+                <motion.div
+                    className="absolute w-80 h-80 rounded-full pointer-events-none"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, #8b5cf6 0%, #7c3aed 35%, transparent 70%)',
+                        top: '-20%',
+                        right: '-10%'
+                    }}
+                    animate={{ scale: [1, 1.6, 1], rotate: [0, 15, 0] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                {PARTICLES.map(p => (
+                    <motion.div
+                        key={p.id}
+                        className="absolute rounded-full pointer-events-none shadow-xl"
+                        style={{
+                            width: p.size,
+                            height: p.size,
+                            background: p.color,
+                            left: p.left,
+                            top: p.top
+                        }}
+                        animate={{
+                            y: [0, -30, 0],
+                            opacity: [0.4, 1, 0.4],
+                            scale: [1, 1.4, 1]
+                        }}
+                        transition={{
+                            duration: p.dur,
+                            repeat: Infinity,
+                            delay: p.delay,
+                            ease: 'easeInOut'
+                        }}
+                    />
                 ))}
 
-                {/* Submit */}
-                <motion.button
-                    type="submit"
-                    disabled={processing}
-                    whileHover={!processing ? { scale: 1.02, y: -1 } : {}}
-                    whileTap={!processing ? { scale: 0.98 } : {}}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r
-                               from-teal-500 to-cyan-500 text-white py-3 rounded-2xl font-bold
-                               text-sm shadow-lg shadow-teal-200 hover:shadow-teal-300
-                               disabled:opacity-60 disabled:cursor-not-allowed
-                               transition-all duration-200 mt-2">
-                    {processing ? (
-                        <>
-                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            Menyimpan...
-                        </>
-                    ) : (
-                        <>
-                            <Save className="w-4 h-4" />
-                            Simpan Penilaian
-                        </>
-                    )}
-                </motion.button>
-            </form>
-        </div>
+                <div className="relative z-10 flex justify-between items-center gap-8">
+                    <div className="flex-1">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="inline-flex items-center gap-3 bg-purple-500/20 border-2 border-purple-400/50
+                                       text-purple-200 text-base font-bold px-6 py-2.5 rounded-3xl backdrop-blur-2xl 
+                                       shadow-2xl mb-5"
+                        >
+                            <Award className="w-5 h-5 text-purple-300 drop-shadow-lg" />
+                            Mode Penilaian Aktif
+                        </motion.div>
+                        <motion.h1
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-4xl font-black text-white tracking-tight drop-shadow-3xl leading-tight"
+                        >
+                            {event?.title || 'Event Title'}
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-purple-200 text-xl font-semibold mt-3 backdrop-blur-xl shadow-lg"
+                        >
+                            {submissions?.length || 0} karya · {criteria.length} kriteria
+                        </motion.p>
+                    </div>
+                    <motion.div
+                        animate={{ rotate: [0, 20, -12, 0], y: [0, -16, 0] }}
+                        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+                        className="text-8xl shrink-0 drop-shadow-3xl"
+                    >
+                        ⚖️
+                    </motion.div>
+                </div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, delay: 0.1 }}
+                    className="bg-gradient-to-br from-slate-900/95 to-purple-900/80 backdrop-blur-xl rounded-3xl shadow-3xl shadow-purple-500/40 
+                               border border-purple-500/30 overflow-hidden max-h-[calc(100vh-200px)]"
+                >
+                    <div className="relative overflow-hidden px-8 py-7 border-b border-purple-500/30
+                                    bg-gradient-to-r from-purple-600 via-indigo-700 to-purple-700 shadow-2xl">
+                        <div
+                            className="absolute inset-0 opacity-20"
+                            style={{
+                                backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
+                                                  linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
+                                backgroundSize: '40px 40px',
+                            }}
+                        />
+                        <div className="relative flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <motion.div
+                                    animate={{ rotate: [0, 18, -12, 0] }}
+                                    transition={{ duration: 6, repeat: Infinity }}
+                                    className="w-14 h-14 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center shadow-2xl"
+                                >
+                                    <FileText className="w-6 h-6 text-white drop-shadow-lg" />
+                                </motion.div>
+                                <div>
+                                    <h2 className="font-black text-white text-2xl drop-shadow-2xl">Karya Peserta</h2>
+                                    <p className="text-purple-200 text-base font-semibold backdrop-blur-sm">Klik untuk dinilai</p>
+                                </div>
+                            </div>
+                            <motion.span
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                                className="bg-white/20 border-2 border-white/30 text-white text-lg font-black 
+                                           px-6 py-3 rounded-3xl backdrop-blur-xl shadow-2xl"
+                            >
+                                {submissions?.filter(s => s.my_scores_count > 0).length || 0}/{submissions?.length || 0} dinilai
+                            </motion.span>
+                        </div>
+                    </div>
+
+                    <div className="p-8 space-y-4 overflow-y-auto custom-scrollbar max-h-[calc(100vh-340px)]">
+                        <AnimatePresence>
+                            {submissions?.length ? (
+                                submissions.map((sub, i) => (
+                                    <SubmissionCard
+                                        key={sub.id}
+                                        sub={sub}
+                                        index={i}
+                                        isSelected={selected?.id === sub.id}
+                                        onSelect={() => setSelected(sub)}
+                                    />
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-slate-400">Tidak ada karya</div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </motion.div>
+
+                <div>
+                    <AnimatePresence mode="wait">
+                        {selected ? (
+                            <motion.div
+                                key={selected.id}
+                                initial={{ opacity: 0, x: 30, scale: 0.97 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: -30, scale: 0.97 }}
+                                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                <ScoreForm submission={selected} criteria={criteria} event={event} />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="empty"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="hidden xl:flex bg-gradient-to-br from-slate-900/70 to-purple-900/50 
+                                           backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-dashed 
+                                           border-purple-400/40 items-center justify-center text-center 
+                                           p-16 h-full min-h-[400px] shadow-purple-500/30"
+                            >
+                                <div className="text-center">
+                                    <motion.div
+                                        animate={{ y: [0, -16, 0], rotate: [0, 8, -5, 0], scale: [1, 1.1, 1] }}
+                                        transition={{ duration: 5, repeat: Infinity }}
+                                        className="text-7xl mb-6 mx-auto w-32 h-32 
+                                                   rounded-3xl flex items-center justify-center shadow-2xl bg-gradient-to-br from-purple-500/20 to-indigo-600/20 backdrop-blur-xl"
+                                    >
+                                        📝
+                                    </motion.div>
+                                    <h3 className="text-3xl font-black text-slate-100 mb-4 drop-shadow-lg">Pilih Karya</h3>
+                                    <p className="text-xl text-slate-300 font-semibold backdrop-blur-sm max-w-md mx-auto">
+                                        Pilih karya di sebelah kiri untuk mulai memberikan penilaian profesional
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: linear-gradient(to bottom, #1e293b, #334155);
+                    border-radius: 12px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: linear-gradient(to bottom, #8b5cf6, #7c3aed);
+                    border-radius: 12px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(to bottom, #7c3aed, #6d28d9);
+                }
+            `}</style>
+        </JuryLayout>
     );
 }

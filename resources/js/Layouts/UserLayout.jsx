@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/Assets/logo.png';
 import {
     LayoutDashboard, CalendarDays, ClipboardList,
-    Trophy, User, LogOut, Menu, X, ChevronDown
+    Trophy, User, LogOut, Menu, X, ChevronRight
 } from 'lucide-react';
 
 const navItems = [
@@ -14,305 +14,297 @@ const navItems = [
     { label: 'Hasil',       href: 'user.results.index',       icon: Trophy          },
 ];
 
-export default function UserLayout({ children, header }) {
-    const { auth, flash } = usePage().props;
+export default function UserLayout({ children }) {
+    const { auth } = usePage().props;
     const user = auth?.user;
-
-    const [mobileOpen, setMobileOpen]   = useState(false);
-    const [dropdownOpen, setDropdown]   = useState(false);
-    const [scrolled, setScrolled]       = useState(false);
-    const [flashVisible, setFlash]      = useState(true);
-    const dropRef = useRef(null);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 10);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    useEffect(() => {
-        const handler = (e) => {
-            if (dropRef.current && !dropRef.current.contains(e.target)) {
-                setDropdown(false);
-            }
+        const check = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) setSidebarOpen(false);
         };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
     }, []);
 
-    useEffect(() => {
-        setFlash(true);
-        const t = setTimeout(() => setFlash(false), 4000);
-        return () => clearTimeout(t);
-    }, [flash?.success, flash?.error, flash?.info]);
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post(route('logout'));
+    };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans">
+        <div className="flex min-h-screen" style={{ background: '#f0f0f8', fontFamily: "'DM Sans', sans-serif" }}>
 
-            {/* ══ NAVBAR ══ */}
-            <motion.nav
-                animate={{
-                    boxShadow: scrolled
-                        ? '0 4px 24px rgba(0,0,0,0.08)'
-                        : '0 1px 0 rgba(0,0,0,0.06)',
-                }}
-                className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="flex h-16 items-center justify-between">
-
-                        {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-                            <img src={Logo} className="w-10 h-10 object-contain" />
-                            <div className="hidden sm:block leading-tight">
-                                <p className="font-black text-indigo-700 text-sm">
-                                    Kite Competition
-                                </p>
-                                <p className="text-[10px] text-gray-400 font-medium">
-                                    Design • Fly • Compete
-                                </p>
-                            </div>
-                        </Link>
-
-                        {/* Desktop Nav */}
-                        <div className="hidden md:flex items-center gap-1">
-                            {navItems.map(item => {
-                                const active = route().current(item.href);
-                                return (
-                                    <Link key={item.href} href={route(item.href)}>
-                                        <motion.div
-                                            whileHover={{ y: -1 }}
-                                            whileTap={{ scale: 0.97 }}
-                                            className={`relative flex items-center gap-2 px-4 py-2
-                                                        rounded-xl text-sm font-semibold transition-all
-                                                        duration-200
-                                                ${active
-                                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                                                    : 'text-gray-600 hover:bg-gray-100 hover:text-indigo-600'
-                                                }`}>
-                                            <item.icon size={15} />
-                                            {item.label}
-                                        </motion.div>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-
-                        {/* Right: User dropdown + mobile toggle */}
-                        <div className="flex items-center gap-2">
-
-                            {/* Desktop User Dropdown */}
-                            <div ref={dropRef} className="relative hidden md:block">
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => setDropdown(!dropdownOpen)}
-                                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl
-                                               hover:bg-gray-100 transition-colors">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br
-                                                    from-indigo-500 to-blue-600 flex items-center
-                                                    justify-center text-white text-sm font-bold
-                                                    shadow-sm shadow-indigo-200">
-                                        {user?.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="text-sm font-semibold text-gray-800 leading-none">
-                                            {user?.name?.split(' ')[0]}
-                                        </p>
-                                        <p className="text-[10px] text-indigo-500 font-medium mt-0.5">
-                                            Peserta
-                                        </p>
-                                    </div>
-                                    <motion.div
-                                        animate={{ rotate: dropdownOpen ? 180 : 0 }}
-                                        transition={{ duration: 0.2 }}>
-                                        <ChevronDown size={14} className="text-gray-400" />
-                                    </motion.div>
-                                </motion.button>
-
-                                <AnimatePresence>
-                                    {dropdownOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                                            transition={{ duration: 0.18 }}
-                                            className="absolute right-0 mt-2 w-52 bg-white border
-                                                       border-gray-100 rounded-2xl shadow-xl
-                                                       shadow-black/10 overflow-hidden">
-
-                                            {/* User info */}
-                                            <div className="px-4 py-3 bg-gradient-to-r from-indigo-50
-                                                            to-blue-50 border-b border-gray-100">
-                                                <p className="text-sm font-bold text-gray-800">
-                                                    {user?.name}
-                                                </p>
-                                                <p className="text-xs text-gray-500 truncate">
-                                                    {user?.email}
-                                                </p>
-                                            </div>
-
-                                            <div className="p-1.5">
-                                                <Link href={route('profile.edit')}
-                                                    onClick={() => setDropdown(false)}
-                                                    className="flex items-center gap-3 px-3 py-2.5
-                                                               rounded-xl text-sm text-gray-700
-                                                               hover:bg-gray-50 transition-colors">
-                                                    <User size={15} className="text-indigo-400" />
-                                                    Edit Profil
-                                                </Link>
-                                            </div>
-
-                                            <div className="p-1.5 border-t border-gray-100">
-                                                <Link href={route('logout')} method="post" as="button"
-                                                    className="flex items-center gap-3 w-full px-3 py-2.5
-                                                               rounded-xl text-sm text-red-600
-                                                               hover:bg-red-50 transition-colors">
-                                                    <LogOut size={15} />
-                                                    Keluar
-                                                </Link>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* Mobile hamburger */}
-                            <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => setMobileOpen(!mobileOpen)}
-                                className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors">
-                                <AnimatePresence mode="wait">
-                                    {mobileOpen ? (
-                                        <motion.div key="close"
-                                            initial={{ rotate: -90, opacity: 0 }}
-                                            animate={{ rotate: 0, opacity: 1 }}
-                                            exit={{ rotate: 90, opacity: 0 }}
-                                            transition={{ duration: 0.15 }}>
-                                            <X size={20} className="text-gray-600" />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div key="menu"
-                                            initial={{ rotate: 90, opacity: 0 }}
-                                            animate={{ rotate: 0, opacity: 1 }}
-                                            exit={{ rotate: -90, opacity: 0 }}
-                                            transition={{ duration: 0.15 }}>
-                                            <Menu size={20} className="text-gray-600" />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile Menu */}
-                <AnimatePresence>
-                    {mobileOpen && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden border-t border-gray-100 bg-white md:hidden">
-                            <div className="px-4 py-4 space-y-1">
-                                {navItems.map(item => (
-                                    <Link key={item.href} href={route(item.href)}
-                                        onClick={() => setMobileOpen(false)}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl
-                                                    text-sm font-semibold transition-colors
-                                            ${route().current(item.href)
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-gray-600 hover:bg-gray-100'}`}>
-                                        <item.icon size={16} />
-                                        {item.label}
-                                    </Link>
-                                ))}
-
-                                <div className="pt-3 mt-3 border-t border-gray-100 space-y-1">
-                                    <div className="px-4 py-2">
-                                        <p className="text-sm font-bold text-gray-800">{user?.name}</p>
-                                        <p className="text-xs text-gray-500">{user?.email}</p>
-                                    </div>
-                                    <Link href={route('profile.edit')}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl
-                                                   text-sm text-gray-600 hover:bg-gray-100">
-                                        <User size={16} /> Edit Profil
-                                    </Link>
-                                    <Link href={route('logout')} method="post" as="button"
-                                        className="flex items-center gap-3 w-full px-4 py-3
-                                                   rounded-xl text-sm text-red-600 hover:bg-red-50">
-                                        <LogOut size={16} /> Keluar
-                                    </Link>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.nav>
-
-            {/* ══ FLASH MESSAGES ══ */}
+            {/* ── Mobile overlay ── */}
             <AnimatePresence>
-                {flashVisible && (flash?.success || flash?.error || flash?.info) && (
+                {isMobile && sidebarOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -16 }}
-                        className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
-                        {flash?.success && (
-                            <div className="flex items-center gap-3 p-3.5 bg-emerald-50 border
-                                            border-emerald-200 text-emerald-800 rounded-2xl text-sm
-                                            font-medium shadow-sm">
-                                <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center
-                                                justify-center text-white text-xs shrink-0">✓</div>
-                                {flash.success}
-                            </div>
-                        )}
-                        {flash?.error && (
-                            <div className="flex items-center gap-3 p-3.5 bg-red-50 border
-                                            border-red-200 text-red-800 rounded-2xl text-sm
-                                            font-medium shadow-sm">
-                                <div className="w-5 h-5 bg-red-500 rounded-full flex items-center
-                                                justify-center text-white text-xs shrink-0">✕</div>
-                                {flash.error}
-                            </div>
-                        )}
-                        {flash?.info && (
-                            <div className="flex items-center gap-3 p-3.5 bg-blue-50 border
-                                            border-blue-200 text-blue-800 rounded-2xl text-sm
-                                            font-medium shadow-sm">
-                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center
-                                                justify-center text-white text-xs shrink-0">ℹ</div>
-                                {flash.info}
-                            </div>
-                        )}
-                    </motion.div>
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
                 )}
             </AnimatePresence>
 
-            {/* ══ PAGE HEADER ══ */}
-            {header && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-6">
-                    <motion.div
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-3">
-                        <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-blue-600
-                                        rounded-full" />
-                        <h1 className="text-xl font-black text-gray-800">{header}</h1>
-                    </motion.div>
-                </div>
-            )}
+            {/* ══════════════════════ SIDEBAR ══════════════════════ */}
+            <AnimatePresence>
+                {sidebarOpen && (
+                    <motion.aside
+                        initial={{ x: -280, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -280, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className={`w-72 flex flex-col h-screen sticky top-0 z-50 overflow-hidden
+                                    ${isMobile ? 'fixed' : ''}`}
+                        style={{
+                            background: 'linear-gradient(170deg, #0f0c29 0%, #302b63 60%, #24243e 100%)',
+                            boxShadow: '8px 0 40px rgba(79,70,229,0.25)',
+                        }}
+                    >
+                        {/* Grid texture overlay */}
+                        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+                            style={{
+                                backgroundImage: `linear-gradient(rgba(255,255,255,0.8) 1px,transparent 1px),
+                                                  linear-gradient(90deg,rgba(255,255,255,0.8) 1px,transparent 1px)`,
+                                backgroundSize: '32px 32px',
+                            }} />
 
-            {/* ══ CONTENT ══ */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12">
-                <motion.div
-                    key={header}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}>
-                    {children}
-                </motion.div>
-            </main>
+                        {/* Purple glow orbs */}
+                        <div className="absolute -top-20 -right-10 w-56 h-56 rounded-full pointer-events-none opacity-20"
+                            style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }} />
+                        <div className="absolute bottom-10 -left-10 w-40 h-40 rounded-full pointer-events-none opacity-15"
+                            style={{ background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)' }} />
+
+                        {/* ── Logo ── */}
+                        <div className="relative z-10 flex items-center gap-3.5 px-6 py-6 shrink-0"
+                            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                            <motion.div
+                                whileHover={{ scale: 1.06, rotate: 3 }}
+                                className="w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center p-1.5 shadow-xl"
+                                style={{
+                                    background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                                    boxShadow: '0 8px 24px rgba(99,102,241,0.5)',
+                                }}
+                            >
+                                <div className="w-full h-full bg-white/90 rounded-xl flex items-center justify-center">
+                                    <img src={Logo} className="w-7 h-7 object-contain" alt="Logo" />
+                                </div>
+                            </motion.div>
+                            <div>
+                                <h1 className="font-black text-white text-base leading-tight tracking-tight">
+                                    Lomba Layangan
+                                </h1>
+                                <p className="text-indigo-300/70 text-xs font-medium mt-0.5">
+                                    Portal Peserta
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* ── Nav ── */}
+                        <nav className="relative z-10 flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+                            <p className="text-indigo-400/50 text-[10px] font-bold uppercase tracking-widest
+                                          px-3 mb-3">Menu Utama</p>
+                            {navItems.map((item, i) => {
+                                const active = route().current(item.href);
+                                return (
+                                    <motion.div
+                                        key={item.href}
+                                        initial={{ opacity: 0, x: -16 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                                    >
+                                        <Link
+                                            href={route(item.href)}
+                                            onClick={() => isMobile && setSidebarOpen(false)}
+                                            className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-2xl
+                                                       text-sm font-semibold transition-all duration-200 group overflow-hidden"
+                                            style={active ? {
+                                                background: 'linear-gradient(135deg, rgba(99,102,241,0.35), rgba(124,58,237,0.25))',
+                                                color: '#fff',
+                                                boxShadow: 'inset 0 0 0 1px rgba(99,102,241,0.4)',
+                                            } : {
+                                                color: 'rgba(199,210,254,0.7)',
+                                            }}
+                                        >
+                                            {/* Hover fill */}
+                                            <motion.div
+                                                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                style={{ background: 'rgba(99,102,241,0.12)' }}
+                                            />
+
+                                            {/* Icon */}
+                                            <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200"
+                                                style={active ? {
+                                                    background: 'rgba(99,102,241,0.5)',
+                                                    boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
+                                                } : {
+                                                    background: 'rgba(255,255,255,0.06)',
+                                                }}>
+                                                <item.icon size={17} />
+                                            </div>
+
+                                            <span className="relative z-10">{item.label}</span>
+
+                                            {active && (
+                                                <motion.div
+                                                    layoutId="activeNav"
+                                                    className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full"
+                                                    style={{ background: '#818cf8' }}
+                                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                                    transition={{ duration: 2, repeat: Infinity }}
+                                                />
+                                            )}
+                                        </Link>
+                                    </motion.div>
+                                );
+                            })}
+                        </nav>
+
+                        {/* ── User section ── */}
+                        <div className="relative z-10 px-3 py-4 shrink-0"
+                            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+
+                            {/* Profile card */}
+                            <div className="flex items-center gap-3 px-3 py-3 rounded-2xl mb-2"
+                                style={{ background: 'rgba(255,255,255,0.04)' }}>
+                                <div className="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center
+                                                font-black text-white text-sm"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                                        boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
+                                    }}>
+                                    {user?.name?.charAt(0)?.toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white font-bold text-sm truncate">{user?.name}</p>
+                                    <div className="flex items-center gap-1 mt-0.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                        <p className="text-emerald-400 text-[10px] font-semibold">Peserta Aktif</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="space-y-1">
+                                <Link href={route('profile.edit')}
+                                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl
+                                               text-sm font-medium transition-all duration-200 group"
+                                    style={{ color: 'rgba(199,210,254,0.7)' }}
+                                    onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+                                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(199,210,254,0.7)'}
+                                >
+                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200"
+                                        style={{ background: 'rgba(255,255,255,0.06)' }}>
+                                        <User size={14} />
+                                    </div>
+                                    Edit Profil
+                                    <ChevronRight size={13} className="ml-auto opacity-40" />
+                                </Link>
+
+                                <button onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl
+                                               text-sm font-medium transition-all duration-200"
+                                    style={{ color: 'rgba(252,165,165,0.7)' }}
+                                    onMouseEnter={e => e.currentTarget.style.color = '#fca5a5'}
+                                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(252,165,165,0.7)'}
+                                >
+                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                                        style={{ background: 'rgba(239,68,68,0.12)' }}>
+                                        <LogOut size={14} />
+                                    </div>
+                                    Keluar
+                                </button>
+                            </div>
+                        </div>
+                    </motion.aside>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════════════ MAIN ══════════════════════ */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+                {/* ── Topbar ── */}
+                <motion.header
+                    initial={{ y: -60, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="sticky top-0 z-30 flex items-center gap-4 px-6 py-3.5"
+                    style={{
+                        background: 'rgba(240,240,248,0.92)',
+                        backdropFilter: 'blur(20px)',
+                        borderBottom: '1px solid rgba(99,102,241,0.1)',
+                        boxShadow: '0 4px 24px rgba(79,70,229,0.06)',
+                    }}
+                >
+                    {/* Toggle sidebar */}
+                    <motion.button
+                        onClick={() => setSidebarOpen(v => !v)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl shrink-0 transition-all duration-200"
+                        style={{
+                            background: 'white',
+                            border: '1px solid rgba(99,102,241,0.15)',
+                            boxShadow: '0 2px 8px rgba(99,102,241,0.1)',
+                            color: '#4f46e5',
+                        }}
+                    >
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={sidebarOpen ? 'x' : 'menu'}
+                                initial={{ rotate: -90, opacity: 0 }}
+                                animate={{ rotate: 0, opacity: 1 }}
+                                exit={{ rotate: 90, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+                            </motion.div>
+                        </AnimatePresence>
+                    </motion.button>
+
+                    {/* Breadcrumb / page indicator */}
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full"
+                                style={{ background: 'linear-gradient(135deg, #6366f1, #7c3aed)' }} />
+                            <span className="text-xs font-semibold" style={{ color: '#6366f1' }}>
+                                Portal Peserta
+                            </span>
+                        </div>
+                        <p className="text-sm font-black text-gray-800 truncate leading-tight">
+                            Selamat datang, {user?.name?.split(' ')[0]} 👋
+                        </p>
+                    </div>
+
+                    {/* Avatar */}
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm shrink-0 cursor-pointer"
+                        style={{
+                            background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                            boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
+                        }}
+                        title={user?.name}
+                    >
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                    </motion.div>
+                </motion.header>
+
+                {/* ── Page content ── */}
+                <main className="flex-1 overflow-auto p-6 md:p-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                    >
+                        {children}
+                    </motion.div>
+                </main>
+            </div>
         </div>
     );
 }

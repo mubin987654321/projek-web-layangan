@@ -53,7 +53,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             />
                             <div className="hidden sm:block">
                                 <p className="font-black text-gray-900 text-sm leading-none">
-                                    Kite Competition
+                                    Lomba Layangan
                                 </p>
                                 <p className="text-[10px] text-indigo-500 font-medium leading-none mt-0.5">
                                     Design · Fly · Compete

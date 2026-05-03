@@ -1,12 +1,12 @@
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, ShieldCheck, Zap, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Logo from '@/Assets/logo.png';
 
 export default function Login({ status, canResetPassword }) {
@@ -16,192 +16,289 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const formRef = useRef(null);
+
     const submit = (e) => {
         e.preventDefault();
         post(route('login'), { onFinish: () => reset('password') });
     };
 
+    useEffect(() => {
+        const handleMouse = (e) => {
+            const rect = formRef.current?.getBoundingClientRect();
+            if (rect) {
+                setMousePos({
+                    x: ((e.clientX - rect.left) / rect.width - 0.5) * 15,
+                    y: ((e.clientY - rect.top) / rect.height - 0.5) * 15,
+                });
+            }
+        };
+        window.addEventListener('mousemove', handleMouse);
+        return () => window.removeEventListener('mousemove', handleMouse);
+    }, []);
+
     return (
         <GuestLayout>
-            <Head title="Login" />
+            <Head title="Masuk - Kite Competition" />
 
-            <div className="min-h-screen flex items-center justify-center
-                            bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950
-                            px-6 relative overflow-hidden">
+            <div className="min-h-screen flex items-center justify-center p-4
+                           bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950
+                           relative overflow-hidden">
 
-                {/* Grid background */}
-                <div className="absolute inset-0 opacity-20"
-                    style={{
-                        backgroundImage: `linear-gradient(rgba(99,102,241,0.3) 1px, transparent 1px),
-                                          linear-gradient(90deg, rgba(99,102,241,0.3) 1px, transparent 1px)`,
-                        backgroundSize: '60px 60px',
-                    }} />
+                {/* Animated Background */}
+                <div className="absolute inset-0">
+                    <motion.div className="absolute w-[350px] h-[350px] bg-purple-500/8 
+                                          rounded-full top-10 left-10 blur-3xl" 
+                        animate={{ y: [0, -15, 0], scale: [1, 1.05, 1] }}
+                        transition={{ duration: 7, repeat: Infinity }} />
+                    <motion.div className="absolute w-[450px] h-[450px] bg-indigo-500/4 
+                                          rounded-full bottom-10 right-10 blur-3xl" 
+                        animate={{ y: [0, 15, 0], scale: [1.05, 1, 1.05] }}
+                        transition={{ duration: 9, repeat: Infinity, delay: 1 }} />
+                    
+                    {/* Subtle grid */}
+                    <div className="absolute inset-0 opacity-10" 
+                         style={{
+                             backgroundImage: `linear-gradient(rgba(168,85,247,0.08) 1px, transparent 1px),
+                                              linear-gradient(90deg, rgba(168,85,247,0.08) 1px, transparent 1px)`,
+                             backgroundSize: '100px 100px',
+                         }} />
+                </div>
 
-                {/* Glowing orbs */}
-                <motion.div className="absolute w-96 h-96 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)', top: '5%', left: '5%', opacity: 0.15 }}
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }} />
-                <motion.div className="absolute w-72 h-72 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', bottom: '10%', right: '5%', opacity: 0.15 }}
-                    animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.08, 0.15] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
+                {/* Main Card */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.92, y: 40 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="relative z-20 w-full max-w-sm mx-auto"
+                    ref={formRef}>
+                    
+                    <motion.div 
+                        style={{ x: mousePos.x, y: mousePos.y, rotateX: mousePos.y * 0.015, rotateY: mousePos.x * 0.015 }}
+                        className="relative bg-white/4 backdrop-blur-3xl border border-white/15 
+                                   shadow-2xl shadow-purple-500/15 rounded-3xl p-10 overflow-hidden
+                                   transform-gpu perspective-1200"
+                        whileHover={{ scale: 1.015, shadow: '0 25px 50px rgba(168,85,247,0.25)' }}>
+                        
+                        {/* Inner glow */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 
+                                       to-indigo-500/10 opacity-0 hover:opacity-100 transition-opacity 
+                                       rounded-3xl blur" />
+                        
+                        {/* Top accent */}
+                        <div className="absolute top-0 left-0 right-0 h-1.5 
+                                       bg-gradient-to-r from-purple-400 via-indigo-400 to-cyan-400 
+                                       shadow-lg rounded-b-3xl" />
 
-                {/* Floating particles */}
-                {[...Array(12)].map((_, i) => (
-                    <motion.div key={i}
-                        className="absolute w-1 h-1 bg-indigo-300 rounded-full opacity-60 pointer-events-none"
-                        style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
-                        animate={{ y: [0, -25, 0], opacity: [0.3, 0.7, 0.3] }}
-                        transition={{ duration: 3 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3, ease: 'easeInOut' }} />
-                ))}
-
-                {/* CARD */}
-                <motion.div
-                    initial={{ opacity: 0, y: 32 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative z-10 w-full max-w-4xl bg-white/10 backdrop-blur-xl
-                               shadow-2xl shadow-black/40 rounded-3xl overflow-hidden
-                               grid md:grid-cols-2 border border-white/10">
-
-                    {/* LEFT — branding */}
-                    <div className="hidden md:flex flex-col justify-center items-center
-                                    bg-gradient-to-br from-indigo-600 to-blue-700 text-white p-12
-                                    relative overflow-hidden">
-                        {/* Corner decoration */}
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10
-                                        rounded-bl-full" />
-                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5
-                                        rounded-tr-full" />
-
-                        <motion.div
-                            animate={{ rotate: [0, 8, -5, 0] }}
-                            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                            className="text-7xl mb-6 relative z-10">
-                            🪁
-                        </motion.div>
-
-                        <div className="relative z-10 flex items-center gap-3 mb-4">
-                            <img src={Logo} className="w-10 h-10 object-contain rounded-xl" />
-                            <div>
-                                <p className="font-black text-white text-lg leading-none">
-                                    Kite Competition
-                                </p>
-                                <p className="text-indigo-200 text-xs font-medium">
-                                    Design • Fly • Compete
-                                </p>
-                            </div>
+                        {/* Logo */}
+                        <div className="flex items-center justify-center mb-10">
+                            <motion.div 
+                                animate={{ rotate: [0, -5, 5, 0] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                                className="w-20 h-20 bg-gradient-to-br from-purple-500 via-indigo-500 to-cyan-500 
+                                          rounded-3xl flex items-center justify-center shadow-2xl 
+                                          border-4 border-white/30 backdrop-blur-sm">
+                                <img src={Logo} className="w-14 h-14 object-contain drop-shadow-lg" />
+                            </motion.div>
                         </div>
 
-                        <p className="relative z-10 text-sm text-indigo-100 text-center
-                                      leading-relaxed max-w-xs">
-                            Fly your creativity higher and join the global kite competition.
-                        </p>
-
-                        <div className="relative z-10 flex gap-1 mt-6">
-                            {[...Array(3)].map((_, i) => (
-                                <Star key={i} className="w-3 h-3 fill-indigo-300 text-indigo-300" />
-                            ))}
-                        </div>
-
-                        {/* Animated badge */}
-                        <motion.div
-                            animate={{ y: [0, -6, 0] }}
-                            transition={{ duration: 4, repeat: Infinity }}
-                            className="relative z-10 mt-8 bg-white/15 border border-white/20
-                                       rounded-2xl px-4 py-2.5 text-center backdrop-blur-sm">
-                            <p className="text-xs font-bold text-white">#1 Platform Layangan</p>
-                            <p className="text-[10px] text-indigo-200 mt-0.5">1200+ Peserta Aktif</p>
-                        </motion.div>
-                    </div>
-
-                    {/* RIGHT — form */}
-                    <div className="p-8 bg-white/5 backdrop-blur-sm">
-                        <div className="mb-6">
-                            <h2 className="text-2xl font-black text-white">
-                                Welcome Back 👋
+                        <div className="text-center mb-10">
+                            <h2 className="text-3xl font-black bg-gradient-to-r 
+                                          from-white via-slate-100 to-purple-100 bg-clip-text 
+                                          text-transparent drop-shadow-2xl mb-2">
+                                Selamat Datang Kembali
                             </h2>
-                            <p className="text-sm text-slate-400 mt-1">
-                                Login to continue your kite journey
+                            <p className="text-slate-400 text-lg font-medium">
+                                Masuk ke akun kompetisimu
                             </p>
                         </div>
 
                         {status && (
-                            <div className="mb-4 text-sm text-emerald-400 bg-emerald-400/10
-                                            border border-emerald-400/20 rounded-xl px-4 py-3">
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="mb-6 p-4 bg-gradient-to-r from-emerald-500/15 to-teal-500/15
+                                          border border-emerald-400/30 text-emerald-300 rounded-2xl 
+                                          backdrop-blur-xl shadow-lg font-medium text-sm">
+                                <ShieldCheck className="w-5 h-5 inline mr-2 mb-1" />
                                 {status}
-                            </div>
+                            </motion.div>
                         )}
 
-                        <form onSubmit={submit} className="space-y-4">
+                        <form onSubmit={submit} className="space-y-6">
+                            {/* Email Field */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}>
+                                <div className="relative">
+                                    <InputLabel htmlFor="email" value="Email Address"
+                                        className="absolute -top-3 left-4 px-2.5 bg-white/95 backdrop-blur-sm 
+                                                  text-xs font-bold text-gray-800 rounded-full shadow-sm z-10" />
+                                    <div className="relative">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 
+                                                       w-5 h-5 text-purple-400 z-10 pointer-events-none" />
+                                        <TextInput
+                                            id="email"
+                                            type="email"
+                                            value={data.email}
+                                            className="w-full pl-14 pr-4 py-4 rounded-2xl border-2 border-white/20
+                                                      bg-white/5 backdrop-blur-xl text-white placeholder:text-slate-400
+                                                      focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50
+                                                      focus:bg-white/10 transition-all duration-400 shadow-xl
+                                                      hover:border-white/30 hover:shadow-2xl"
+                                            placeholder="Masukkan email kamu"
+                                            onChange={e => setData('email', e.target.value)}
+                                            required />
+                                    </div>
+                                    <InputError message={errors.email} className="mt-2 text-red-400 text-xs font-medium" />
+                                </div>
+                            </motion.div>
 
-                            <div>
-                                <InputLabel htmlFor="email" value="Email"
-                                    className="text-slate-300 text-sm font-medium" />
-                                <TextInput
-                                    id="email" type="email" value={data.email}
-                                    className="mt-1 block w-full rounded-xl border-white/10
-                                               bg-white/10 text-white placeholder:text-slate-500
-                                               focus:ring-indigo-500 focus:border-indigo-500
-                                               backdrop-blur-sm"
-                                    autoComplete="username" isFocused
-                                    onChange={(e) => setData('email', e.target.value)}
+                            {/* Password Field */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}>
+                                <div className="relative">
+                                    <InputLabel htmlFor="password" value="Password"
+                                        className="absolute -top-3 left-4 px-2.5 bg-white/95 backdrop-blur-sm 
+                                                  text-xs font-bold text-gray-800 rounded-full shadow-sm z-10" />
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 
+                                                       w-5 h-5 text-purple-400 z-10 pointer-events-none" />
+                                        <TextInput
+                                            id="password"
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={data.password}
+                                            className="w-full pl-14 pr-12 py-4 rounded-2xl border-2 border-white/20
+                                                      bg-white/5 backdrop-blur-xl text-white placeholder:text-slate-400
+                                                      focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50
+                                                      focus:bg-white/10 transition-all duration-400 shadow-xl
+                                                      hover:border-white/30 hover:shadow-2xl"
+                                            placeholder="Masukkan password"
+                                            onChange={e => setData('password', e.target.value)}
+                                            required />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 
+                                                      hover:bg-white/10 rounded-xl transition-all">
+                                            {showPassword ? (
+                                                <EyeOff className="w-5 h-5 text-slate-400 hover:text-white" />
+                                            ) : (
+                                                <Eye className="w-5 h-5 text-slate-400 hover:text-white" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    <InputError message={errors.password} className="mt-2 text-red-400 text-xs font-medium" />
+                                </div>
+                            </motion.div>
+
+                            {/* Remember Me */}
+                            <motion.div 
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="flex items-center">
+                                <Checkbox
+                                    checked={data.remember}
+                                    onChange={e => setData('remember', e.target.checked)}
+                                    className="rounded border-gray-300 text-purple-600 
+                                              focus:ring-purple-500 w-5 h-5"
                                 />
-                                <InputError message={errors.email} className="mt-1" />
-                            </div>
+                                <span className="ml-3 text-sm text-slate-400 font-medium">
+                                    Ingat saya
+                                </span>
+                            </motion.div>
 
-                            <div>
-                                <InputLabel htmlFor="password" value="Password"
-                                    className="text-slate-300 text-sm font-medium" />
-                                <TextInput
-                                    id="password" type="password" value={data.password}
-                                    className="mt-1 block w-full rounded-xl border-white/10
-                                               bg-white/10 text-white placeholder:text-slate-500
-                                               focus:ring-indigo-500 focus:border-indigo-500
-                                               backdrop-blur-sm"
-                                    autoComplete="current-password"
-                                    onChange={(e) => setData('password', e.target.value)}
-                                />
-                                <InputError message={errors.password} className="mt-1" />
-                            </div>
-
-                            <div className="flex items-center">
-                                <Checkbox name="remember" checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)} />
-                                <span className="ml-2 text-sm text-slate-400">Remember me</span>
-                            </div>
-
-                            <motion.button
-                                type="submit" disabled={processing}
-                                whileHover={{ scale: 1.01, y: -1 }}
-                                whileTap={{ scale: 0.99 }}
-                                className="w-full flex items-center justify-center gap-2
-                                           bg-gradient-to-r from-indigo-500 to-blue-600
-                                           text-white font-bold py-3 rounded-xl
-                                           shadow-lg shadow-indigo-500/30
-                                           hover:shadow-indigo-500/50 transition-all
-                                           disabled:opacity-50 disabled:cursor-not-allowed">
-                                {processing ? 'Logging in...' : 'Log In'}
-                                {!processing && <ArrowRight className="w-4 h-4" />}
+                            {/* Submit Button */}
+                            <motion.button 
+                                type="submit" 
+                                disabled={processing}
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full relative group overflow-hidden bg-gradient-to-r 
+                                          from-purple-500 via-indigo-500 to-purple-600 hover:from-purple-600
+                                          hover:via-indigo-600 hover:to-purple-700 text-white font-black 
+                                          py-5 px-6 rounded-2xl shadow-2xl shadow-purple-500/40
+                                          hover:shadow-purple-500/60 focus:shadow-purple-500/70
+                                          disabled:opacity-50 disabled:cursor-not-allowed
+                                          disabled:hover:shadow-purple-500/20 transition-all duration-500">
+                                
+                                {/* Shimmer */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent 
+                                               via-white/30 to-transparent -skew-x-12 -translate-x-full
+                                               group-hover:translate-x-full transition-transform duration-700" />
+                                
+                                <div className="relative flex items-center justify-center gap-3">
+                                    {processing ? (
+                                        <>
+                                            <div className="w-6 h-6 border-2 border-white/30 border-t-white 
+                                                           rounded-full animate-spin shrink-0" />
+                                            Memproses...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap className="w-5 h-5 shrink-0" />
+                                            Masuk Sekarang
+                                            <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                        </>
+                                    )}
+                                </div>
                             </motion.button>
 
-                            <div className="flex justify-between text-sm pt-1">
+                            {/* Links */}
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                className="flex flex-col sm:flex-row justify-between items-center 
+                                           gap-4 pt-6 border-t border-white/10">
+                                
                                 {canResetPassword && (
                                     <Link href={route('password.request')}
-                                        className="text-slate-400 hover:text-indigo-400 transition">
-                                        Forgot password?
+                                        className="text-purple-400 hover:text-purple-300 text-sm 
+                                                  font-bold bg-gradient-to-r from-purple-500/5 to-indigo-500/5
+                                                  px-4 py-2 rounded-xl backdrop-blur-sm border border-purple-400/20
+                                                  hover:border-purple-400/40 hover:shadow-md transition-all">
+                                        Lupa Password?
                                     </Link>
                                 )}
+                                
                                 <Link href={route('register')}
-                                    className="text-indigo-400 hover:text-indigo-300
-                                               hover:underline transition">
-                                    Create account
-                                </Link>
-                            </div>
+                                    className="text-indigo-400 hover:text-indigo-300 text-sm 
+                                              font-bold bg-gradient-to-r from-indigo-500/5 to-purple-500/5
+                                              px-4 py-2 rounded-xl backdrop-blur-sm border border-indigo-400/20
+                                              hover:border-indigo-400/40 hover:shadow-md transition-all">
+                                        Buat Akun Baru
+                                    </Link>
+                            </motion.div>
                         </form>
-                    </div>
+                    </motion.div>
                 </motion.div>
+
+                {/* Floating Elements */}
+                {[...Array(15)].map((_, i) => (
+                    <motion.div 
+                        key={`particle-${i}`}
+                        className="absolute w-[6px] h-[6px] bg-gradient-to-r from-purple-400 
+                                  to-indigo-400 rounded-full shadow-lg opacity-70 pointer-events-none"
+                        style={{ 
+                            left: `${15 + i * 5.5}%`, 
+                            top: `${25 + (i % 4) * 20}%`,
+                            animationDelay: `${i * 0.15}s`
+                        }}
+                        animate={{ 
+                            y: [0, -40, 0],
+                            opacity: [0.7, 1, 0.7],
+                            scale: [1, 1.4, 1]
+                        }}
+                        transition={{ 
+                            duration: 5 + i * 0.3, 
+                            repeat: Infinity, 
+                            ease: 'easeInOut' 
+                        }} />
+                ))}
             </div>
         </GuestLayout>
     );

@@ -3,49 +3,45 @@ import { Head, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     BarChart3, CalendarDays, CheckCircle2,
-    Trophy, Users, UserCog, ChevronRight,
-    MapPin, TrendingUp
+    Trophy, Users, UserCog, MapPin, TrendingUp
 } from 'lucide-react';
 
 const fadeUp  = {
     hidden: { opacity: 0, y: 16 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }
+    show:   { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
 };
 const stagger = { show: { transition: { staggerChildren: 0.07 } } };
 
 const STATUS_CFG = {
-    draft:    { label: 'Draft',    bg: 'bg-gray-100',    text: 'text-gray-600',    dot: 'bg-gray-400'    },
-    open:     { label: 'Open',     bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-    closed:   { label: 'Closed',   bg: 'bg-amber-100',   text: 'text-amber-700',   dot: 'bg-amber-500'   },
-    ongoing:  { label: 'Ongoing',  bg: 'bg-blue-100',    text: 'text-blue-700',    dot: 'bg-blue-500'    },
-    finished: { label: 'Finished', bg: 'bg-violet-100',  text: 'text-violet-700',  dot: 'bg-violet-500'  },
+    draft:    { label: 'Draft',    bg: 'rgba(148,163,184,0.15)', text: '#64748b', dot: '#94a3b8' },
+    open:     { label: 'Open',     bg: 'rgba(16,185,129,0.12)', text: '#059669', dot: '#10b981' },
+    closed:   { label: 'Closed',   bg: 'rgba(245,158,11,0.12)', text: '#b45309', dot: '#f59e0b' },
+    ongoing:  { label: 'Ongoing',  bg: 'rgba(99,102,241,0.12)', text: '#4f46e5', dot: '#6366f1' },
+    finished: { label: 'Finished', bg: 'rgba(124,58,237,0.12)', text: '#6d28d9', dot: '#7c3aed' },
 };
 
 export default function ReportsIndex({ events }) {
     const totalActive   = events.filter(e => e.status === 'open').length;
     const totalFinished = events.filter(e => e.status === 'finished').length;
 
-    const stats = [
+    const statCards = [
         {
-            label:  'Total Event',
-            value:  events.length,
-            icon:   CalendarDays,
-            grad:   'from-indigo-500 to-blue-600',
-            shadow: 'shadow-indigo-200',
+            label: 'Total Event',   value: events.length,
+            icon: CalendarDays,
+            bg: 'from-[#6366f1] to-[#818cf8]', glow: 'rgba(99,102,241,0.35)',
+            badge: 'bg-indigo-100/60 text-indigo-700',
         },
         {
-            label:  'Event Aktif',
-            value:  totalActive,
-            icon:   TrendingUp,
-            grad:   'from-emerald-500 to-teal-600',
-            shadow: 'shadow-emerald-200',
+            label: 'Event Aktif',   value: totalActive,
+            icon: TrendingUp,
+            bg: 'from-[#10b981] to-[#34d399]', glow: 'rgba(16,185,129,0.35)',
+            badge: 'bg-emerald-100/60 text-emerald-700',
         },
         {
-            label:  'Event Selesai',
-            value:  totalFinished,
-            icon:   CheckCircle2,
-            grad:   'from-violet-500 to-purple-600',
-            shadow: 'shadow-violet-200',
+            label: 'Event Selesai', value: totalFinished,
+            icon: CheckCircle2,
+            bg: 'from-[#7c3aed] to-[#a78bfa]', glow: 'rgba(124,58,237,0.35)',
+            badge: 'bg-violet-100/60 text-violet-700',
         },
     ];
 
@@ -55,32 +51,60 @@ export default function ReportsIndex({ events }) {
 
             {/* ── Hero Banner ── */}
             <motion.div
-                initial={{ opacity: 0, y: -16 }}
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br
-                           from-slate-800 via-indigo-900 to-blue-900 p-6 mb-8 text-white">
-                <div className="absolute inset-0">
-                    <div className="absolute top-0 right-0 w-72 h-72 bg-white/5
-                                    rounded-full translate-x-1/3 -translate-y-1/3" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-400/10
-                                    rounded-full -translate-x-1/4 translate-y-1/4" />
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="relative overflow-hidden rounded-3xl mb-8"
+                style={{
+                    background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+                    boxShadow: '0 25px 60px -10px rgba(79,70,229,0.5)',
+                }}
+            >
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-25"
+                        style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }} />
+                    <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full opacity-20"
+                        style={{ background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)' }} />
+                    <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="gridRep" width="32" height="32" patternUnits="userSpaceOnUse">
+                                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeWidth="0.5" />
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#gridRep)" />
+                    </svg>
                 </div>
-                <div className="relative z-10 flex justify-between items-center">
+
+                <div className="relative z-10 flex justify-between items-center p-8">
                     <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <BarChart3 className="w-4 h-4 text-indigo-300" />
-                            <span className="text-indigo-300 text-sm font-medium">Panel Administrator</span>
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full
+                                            bg-white/10 backdrop-blur-sm border border-white/20">
+                                <BarChart3 className="w-3.5 h-3.5 text-indigo-300" />
+                                <span className="text-indigo-200 text-xs font-semibold tracking-wide uppercase">
+                                    Panel Administrator
+                                </span>
+                            </div>
                         </div>
-                        <h1 className="text-2xl font-black">Laporan & Statistik 📊</h1>
-                        <p className="text-slate-300 text-sm mt-1">
+                        <h1 className="text-3xl font-black text-white mb-1.5 tracking-tight"
+                            style={{ textShadow: '0 0 40px rgba(129,140,248,0.6)' }}>
+                            Laporan & Statistik 📊
+                        </h1>
+                        <p className="text-indigo-200/80 text-sm">
                             Pantau performa semua event dalam satu tampilan.
                         </p>
                     </div>
+
                     <motion.div
-                        animate={{ rotate: [0, 8, -4, 0], y: [0, -6, 0] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                        className="text-5xl hidden md:block">
+                        animate={{ rotate: [0, 6, -4, 0], y: [0, -8, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                        className="hidden md:flex items-center justify-center w-24 h-24 rounded-3xl text-5xl"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(124,58,237,0.2))',
+                            boxShadow: '0 8px 32px rgba(99,102,241,0.3), inset 0 0 0 1px rgba(255,255,255,0.1)',
+                            backdropFilter: 'blur(12px)',
+                        }}
+                    >
                         📊
                     </motion.div>
                 </div>
@@ -90,19 +114,29 @@ export default function ReportsIndex({ events }) {
             <motion.div
                 initial="hidden" animate="show" variants={stagger}
                 className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                {stats.map((s, i) => (
+                {statCards.map((s, i) => (
                     <motion.div key={i} variants={fadeUp}
-                        whileHover={{ y: -4, scale: 1.03 }}
-                        className={`bg-white rounded-2xl p-5 shadow-lg ${s.shadow}
-                                    border border-gray-100 flex items-center gap-4`}>
-                        <div className={`w-12 h-12 bg-gradient-to-br ${s.grad} rounded-xl
-                                         flex items-center justify-center shadow-md shrink-0`}>
-                            <s.icon className="w-5 h-5 text-white" />
+                        whileHover={{ y: -6, scale: 1.03 }}
+                        transition={{ type: 'spring', stiffness: 300 }}
+                        className="relative overflow-hidden rounded-2xl bg-white border border-gray-100/80"
+                        style={{ boxShadow: `0 8px 32px -4px ${s.glow}, 0 2px 8px rgba(0,0,0,0.06)` }}>
+                        <div className={`h-1 w-full bg-gradient-to-r ${s.bg}`} />
+                        <div className="p-5">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className={`w-11 h-11 bg-gradient-to-br ${s.bg} rounded-xl
+                                               flex items-center justify-center shadow-lg`}
+                                    style={{ boxShadow: `0 6px 16px -2px ${s.glow}` }}>
+                                    <s.icon className="w-5 h-5 text-white" />
+                                </div>
+                                <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.badge}`}>
+                                    ↑ live
+                                </div>
+                            </div>
+                            <p className="text-3xl font-black text-gray-900 tabular-nums">{s.value}</p>
+                            <p className="text-xs text-gray-500 mt-1 font-medium">{s.label}</p>
                         </div>
-                        <div>
-                            <p className="text-2xl font-black text-gray-800">{s.value}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
-                        </div>
+                        <div className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full opacity-10"
+                            style={{ background: `radial-gradient(circle, ${s.glow}, transparent)` }} />
                     </motion.div>
                 ))}
             </motion.div>
@@ -112,23 +146,36 @@ export default function ReportsIndex({ events }) {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-
-                <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-                    <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <BarChart3 className="w-4 h-4 text-indigo-600" />
+                className="rounded-3xl overflow-hidden"
+                style={{
+                    background: 'white',
+                    boxShadow: '0 4px 32px -4px rgba(99,102,241,0.15), 0 2px 8px rgba(0,0,0,0.06)',
+                    border: '1px solid rgba(99,102,241,0.12)',
+                }}
+            >
+                <div className="flex items-center gap-3 px-6 py-4"
+                    style={{ borderBottom: '1px solid rgba(99,102,241,0.1)',
+                             background: 'linear-gradient(to right, rgba(238,242,255,0.8), rgba(245,243,255,0.5))' }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                        style={{ background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                                 boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                        <BarChart3 className="w-4 h-4 text-white" />
                     </div>
-                    <h2 className="font-bold text-gray-800">Daftar Event & Statistik</h2>
+                    <div>
+                        <h2 className="font-bold text-gray-800 text-sm">Daftar Event & Statistik</h2>
+                        <p className="text-xs text-gray-400">Ringkasan performa per event</p>
+                    </div>
                 </div>
 
                 {/* Desktop Table */}
                 <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="bg-gray-50">
+                            <tr>
                                 {['Event', 'Status', 'Peserta', 'Juri', 'Periode', 'Aksi'].map(h => (
-                                    <th key={h} className="px-5 py-3.5 text-left text-xs font-bold
-                                                            text-gray-500 uppercase tracking-wider">
+                                    <th key={h}
+                                        className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider"
+                                        style={{ background: 'rgba(238,242,255,0.7)', color: 'rgba(99,102,241,0.8)' }}>
                                         {h}
                                     </th>
                                 ))}
@@ -136,7 +183,8 @@ export default function ReportsIndex({ events }) {
                         </thead>
                         <motion.tbody
                             initial="hidden" animate="show" variants={stagger}
-                            className="divide-y divide-gray-50">
+                            className="divide-y"
+                            style={{ borderColor: 'rgba(99,102,241,0.06)' }}>
                             {events.length === 0 ? (
                                 <tr>
                                     <td colSpan={6}>
@@ -144,7 +192,7 @@ export default function ReportsIndex({ events }) {
                                             <motion.div animate={{ y: [0, -8, 0] }}
                                                 transition={{ duration: 3, repeat: Infinity }}
                                                 className="text-5xl mb-3">📭</motion.div>
-                                            <p className="text-sm">Belum ada event.</p>
+                                            <p className="text-sm font-medium">Belum ada event.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -179,13 +227,26 @@ export default function ReportsIndex({ events }) {
     );
 }
 
+/* ── Status Badge ── */
+function StatusBadge({ status }) {
+    const cfg = STATUS_CFG[status] ?? STATUS_CFG.draft;
+    return (
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full"
+            style={{ background: cfg.bg, color: cfg.text }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
+            {cfg.label}
+        </span>
+    );
+}
+
 /* ── Desktop Row ── */
 function EventRow({ event }) {
-    const cfg = STATUS_CFG[event.status] ?? STATUS_CFG.draft;
     return (
         <motion.tr variants={fadeUp}
-            className="hover:bg-indigo-50/30 transition-colors duration-150">
-            {/* Event */}
+            className="transition-colors duration-150"
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(238,242,255,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+
             <td className="px-5 py-4">
                 <p className="font-bold text-gray-800 text-sm">{event.title}</p>
                 <p className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
@@ -193,42 +254,34 @@ function EventRow({ event }) {
                     {event.location ?? 'Lokasi belum ditentukan'}
                 </p>
             </td>
-            {/* Status */}
+
             <td className="px-5 py-4">
-                <span className={`inline-flex items-center gap-1.5 text-xs font-bold
-                                  px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                    {cfg.label}
-                </span>
+                <StatusBadge status={event.status} />
             </td>
-            {/* Peserta */}
+
             <td className="px-5 py-4">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 bg-indigo-100 rounded-lg flex items-center
-                                    justify-center shrink-0">
-                        <Users className="w-3 h-3 text-indigo-600" />
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: 'rgba(99,102,241,0.1)' }}>
+                        <Users className="w-3 h-3" style={{ color: '#6366f1' }} />
                     </div>
-                    <span className="font-bold text-gray-800 text-sm">
-                        {event.registrations_count}
-                    </span>
+                    <span className="font-bold text-gray-800 text-sm">{event.registrations_count}</span>
                     {event.max_participants && (
                         <span className="text-xs text-gray-400">/ {event.max_participants}</span>
                     )}
                 </div>
             </td>
-            {/* Juri */}
+
             <td className="px-5 py-4">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 bg-violet-100 rounded-lg flex items-center
-                                    justify-center shrink-0">
-                        <UserCog className="w-3 h-3 text-violet-600" />
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: 'rgba(124,58,237,0.1)' }}>
+                        <UserCog className="w-3 h-3" style={{ color: '#7c3aed' }} />
                     </div>
-                    <span className="font-bold text-gray-800 text-sm">
-                        {event.jury_assignments_count}
-                    </span>
+                    <span className="font-bold text-gray-800 text-sm">{event.jury_assignments_count}</span>
                 </div>
             </td>
-            {/* Periode */}
+
             <td className="px-5 py-4">
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                     <CalendarDays className="w-3.5 h-3.5 text-gray-400 shrink-0" />
@@ -236,16 +289,21 @@ function EventRow({ event }) {
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5 pl-5">s/d {event.event_end}</p>
             </td>
-            {/* Aksi */}
+
             <td className="px-5 py-4">
-                <Link href={route('admin.reports.leaderboard', event.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700
-                               border border-amber-100 rounded-xl text-xs font-bold
-                               hover:bg-amber-100 hover:-translate-y-0.5 transition-all duration-200
-                               whitespace-nowrap">
-                    <Trophy className="w-3.5 h-3.5" />
-                    Leaderboard
-                </Link>
+                <motion.div whileHover={{ y: -2 }} className="inline-block">
+                    <Link href={route('admin.reports.leaderboard', event.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold
+                                   transition-all duration-200 whitespace-nowrap"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.08))',
+                            color: '#b45309',
+                            border: '1px solid rgba(245,158,11,0.25)',
+                        }}>
+                        <Trophy className="w-3.5 h-3.5" />
+                        Leaderboard
+                    </Link>
+                </motion.div>
             </td>
         </motion.tr>
     );
@@ -253,14 +311,17 @@ function EventRow({ event }) {
 
 /* ── Mobile Card ── */
 function EventMobileCard({ event, index }) {
-    const cfg = STATUS_CFG[event.status] ?? STATUS_CFG.draft;
     return (
         <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.06 }}
-            className="p-4 rounded-2xl border border-gray-100 bg-gray-50/40
-                       hover:border-indigo-200 transition-colors duration-200">
+            transition={{ delay: index * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="p-4 rounded-2xl transition-colors duration-200"
+            style={{
+                background: 'linear-gradient(135deg, rgba(238,242,255,0.6), rgba(245,243,255,0.4))',
+                border: '1px solid rgba(99,102,241,0.15)',
+            }}
+        >
             <div className="flex justify-between items-start gap-2 mb-3">
                 <div>
                     <p className="font-bold text-gray-800 text-sm">{event.title}</p>
@@ -269,20 +330,17 @@ function EventMobileCard({ event, index }) {
                         {event.location ?? 'Lokasi belum ditentukan'}
                     </p>
                 </div>
-                <span className={`inline-flex items-center gap-1.5 text-xs font-bold
-                                  px-2.5 py-1 rounded-full shrink-0 ${cfg.bg} ${cfg.text}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                    {cfg.label}
-                </span>
+                <StatusBadge status={event.status} />
             </div>
+
             <div className="flex flex-wrap gap-3 text-xs mb-3">
-                <span className="flex items-center gap-1 text-gray-600 font-medium">
-                    <Users className="w-3 h-3 text-indigo-400" />
+                <span className="flex items-center gap-1 font-medium" style={{ color: '#4f46e5' }}>
+                    <Users className="w-3 h-3" />
                     {event.registrations_count}
                     {event.max_participants ? `/${event.max_participants}` : ''} peserta
                 </span>
-                <span className="flex items-center gap-1 text-gray-600 font-medium">
-                    <UserCog className="w-3 h-3 text-violet-400" />
+                <span className="flex items-center gap-1 font-medium" style={{ color: '#7c3aed' }}>
+                    <UserCog className="w-3 h-3" />
                     {event.jury_assignments_count} juri
                 </span>
                 <span className="flex items-center gap-1 text-gray-500">
@@ -290,13 +348,20 @@ function EventMobileCard({ event, index }) {
                     {event.event_start} – {event.event_end}
                 </span>
             </div>
-            <Link href={route('admin.reports.leaderboard', event.id)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-50
-                           text-amber-700 border border-amber-100 rounded-2xl text-xs font-bold
-                           hover:bg-amber-100 hover:-translate-y-0.5 transition-all duration-200">
-                <Trophy className="w-3.5 h-3.5" />
-                Lihat Leaderboard
-            </Link>
+
+            <motion.div whileHover={{ y: -2 }}>
+                <Link href={route('admin.reports.leaderboard', event.id)}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl
+                               text-xs font-bold transition-all duration-200"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.08))',
+                        color: '#b45309',
+                        border: '1px solid rgba(245,158,11,0.25)',
+                    }}>
+                    <Trophy className="w-3.5 h-3.5" />
+                    Lihat Leaderboard
+                </Link>
+            </motion.div>
         </motion.div>
     );
 }

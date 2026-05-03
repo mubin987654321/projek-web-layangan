@@ -22,7 +22,7 @@ function TiltCard({ children, className = '', intensity = 12 }) {
     }, [intensity]);
     const onLeave = useCallback(() => { rotX.set(0); rotY.set(0); }, []);
     const shimmerBg = useTransform(shine, [0, 100],
-        ['rgba(20,184,166,0)', 'rgba(20,184,166,0.10)']);
+        ['rgba(168,85,247,0)', 'rgba(168,85,247,0.12)']);
     return (
         <motion.div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
             style={{ rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d', perspective: 700 }}
@@ -38,7 +38,7 @@ function TiltCard({ children, className = '', intensity = 12 }) {
 const PARTICLES = Array.from({ length: 16 }, (_, i) => ({
     id: i, left: `${(i * 337) % 100}%`, top: `${(i * 271) % 100}%`,
     dur: 2.5 + (i % 4), delay: (i % 5) * 0.6, size: 2 + (i % 3),
-    color: ['#2dd4bf','#67e8f9','#34d399','#a5f3fc','#5eead4'][i % 5],
+    color: ['#a855f7','#c084fc','#8b5cf6','#a78bfa','#c4b5fd'][i % 5],
 }));
 
 const stagger = { show: { transition: { staggerChildren: 0.08 } } };
@@ -50,14 +50,14 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
     const stats = [
         {
             label: 'Karya Dinilai Bulan Ini', value: scoredThisMonth,
-            icon: ClipboardCheck, grad: 'from-teal-400 to-cyan-500',
-            shadow: 'shadow-teal-200', glow: 'rgba(45,212,191,0.25)',
+            icon: ClipboardCheck, grad: 'from-purple-500 to-indigo-600',
+            shadow: 'shadow-purple-200/50', glow: 'rgba(168,85,247,0.25)',
             emoji: '📋',
         },
         {
             label: 'Total Penilaian Diberikan', value: totalScores,
-            icon: Star, grad: 'from-cyan-400 to-teal-500',
-            shadow: 'shadow-cyan-200', glow: 'rgba(103,232,249,0.25)',
+            icon: Star, grad: 'from-indigo-500 to-purple-600',
+            shadow: 'shadow-indigo-200/50', glow: 'rgba(192,132,252,0.25)',
             emoji: '⭐',
         },
     ];
@@ -72,48 +72,48 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
                 className="relative overflow-hidden rounded-3xl mb-8
-                           bg-gradient-to-br from-slate-900 via-teal-950 to-cyan-950
-                           p-7 text-white shadow-2xl shadow-teal-950/40">
+                           bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950
+                           p-7 text-white shadow-2xl shadow-purple-950/40 border border-purple-800/30">
 
                 {/* Grid */}
-                <div className="absolute inset-0 opacity-[0.08]" style={{
-                    backgroundImage: `linear-gradient(rgba(45,212,191,0.5) 1px, transparent 1px),
-                                      linear-gradient(90deg, rgba(45,212,191,0.5) 1px, transparent 1px)`,
+                <div className="absolute inset-0 opacity-[0.06]" style={{
+                    backgroundImage: `linear-gradient(rgba(168,85,247,0.4) 1px, transparent 1px),
+                                      linear-gradient(90deg, rgba(168,85,247,0.4) 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
                 }} />
 
                 {/* Orbs */}
                 <motion.div className="absolute w-72 h-72 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, #2dd4bf 0%, transparent 70%)', top: '-20%', right: '-5%', opacity: 0.18 }}
+                    style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', top: '-20%', right: '-5%', opacity: 0.2 }}
                     animate={{ scale: [1, 1.4, 1] }}
                     transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} />
                 <motion.div className="absolute w-48 h-48 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, #67e8f9 0%, transparent 70%)', bottom: '-15%', left: '5%', opacity: 0.15 }}
+                    style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)', bottom: '-15%', left: '5%', opacity: 0.18 }}
                     animate={{ scale: [1.2, 1, 1.2] }}
                     transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }} />
 
                 {/* Particles */}
                 {PARTICLES.map(p => (
-                    <motion.div key={p.id} className="absolute rounded-full pointer-events-none"
+                    <motion.div key={p.id} className="absolute rounded-full pointer-events-none shadow-lg"
                         style={{ width: p.size, height: p.size, background: p.color, left: p.left, top: p.top }}
-                        animate={{ y: [0, -18, 0], opacity: [0.2, 0.8, 0.2] }}
+                        animate={{ y: [0, -18, 0], opacity: [0.3, 0.9, 0.3] }}
                         transition={{ duration: p.dur, repeat: Infinity, delay: p.delay }} />
                 ))}
 
                 <div className="relative z-10 flex justify-between items-center gap-5">
                     <div>
                         <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-                            className="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-400/30
-                                       text-teal-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-3">
-                            <Zap className="w-3 h-3 text-yellow-300" />
+                            className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-400/40
+                                       text-purple-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-3 backdrop-blur-sm">
+                            <Zap className="w-3 h-3 text-purple-300" />
                             Panel Juri
                         </motion.div>
                         <motion.h1 initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-                            className="text-2xl font-black text-white tracking-tight">
+                            className="text-2xl font-black text-white tracking-tight drop-shadow-lg">
                             Dashboard Juri ⚖️
                         </motion.h1>
                         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-                            className="text-slate-300 text-sm mt-1">
+                            className="text-slate-300 text-sm mt-1 backdrop-blur-sm">
                             Nilai karya peserta dengan adil dan profesional.
                         </motion.p>
                     </div>
@@ -122,7 +122,7 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                     <motion.div
                         animate={{ rotate: [0, 5, -3, 0], y: [0, -8, 0] }}
                         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                        className="hidden sm:block shrink-0 text-6xl">
+                        className="hidden sm:block shrink-0 text-6xl drop-shadow-2xl">
                         ⚖️
                     </motion.div>
                 </div>
@@ -130,7 +130,7 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
 
             {/* ── STAT CARDS ── */}
             <motion.div initial="hidden" animate="show" variants={stagger}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 {stats.map((s, i) => (
                     <motion.div key={i} variants={fadeUp}>
                         <TiltCard className="group" intensity={14}>
@@ -138,8 +138,8 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                                 onHoverStart={() => setHoveredCard(i)}
                                 onHoverEnd={() => setHoveredCard(null)}
                                 whileHover={{ y: -6 }}
-                                className={`relative bg-white rounded-2xl p-6 shadow-lg ${s.shadow}
-                                            border border-gray-100 flex items-center gap-5 overflow-hidden`}>
+                                className={`relative bg-gradient-to-br from-slate-900/80 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 shadow-xl ${s.shadow}
+                                            border border-purple-500/30 flex items-center gap-5 overflow-hidden ring-1 ring-purple-500/20`}>
 
                                 {/* Glow */}
                                 <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -152,19 +152,19 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                                     transition={{ duration: 0.6, ease: 'easeInOut' }}
                                     style={{ transformStyle: 'preserve-3d' }}
                                     className={`w-14 h-14 bg-gradient-to-br ${s.grad} rounded-2xl
-                                                flex items-center justify-center shadow-lg shrink-0`}>
-                                    <s.icon size={24} className="text-white" />
+                                                flex items-center justify-center shadow-2xl ring-2 ring-white/30 shrink-0 backdrop-blur-xl`}>
+                                    <s.icon size={24} className="text-white drop-shadow-lg" />
                                 </motion.div>
 
                                 <div>
-                                    <motion.p className="text-3xl font-black text-gray-800 tabular-nums"
+                                    <motion.p className="text-3xl font-black text-slate-100 tabular-nums drop-shadow-lg"
                                         key={s.value}
-                                        initial={{ scale: 1.3, color: '#0d9488' }}
-                                        animate={{ scale: 1, color: '#1f2937' }}
+                                        initial={{ scale: 1.3, color: '#a855f7' }}
+                                        animate={{ scale: 1, color: '#f8fafc' }}
                                         transition={{ duration: 0.4 }}>
                                         {s.value}
                                     </motion.p>
-                                    <p className="text-xs text-gray-500 mt-0.5 font-medium">{s.label}</p>
+                                    <p className="text-sm text-slate-300 mt-0.5 font-semibold drop-shadow-sm">{s.label}</p>
                                 </div>
 
                                 {/* Corner emoji */}
@@ -173,13 +173,13 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                                         ? { opacity: 1, scale: 1, rotate: 10 }
                                         : { opacity: 0, scale: 0.6, rotate: 0 }}
                                     transition={{ duration: 0.25 }}
-                                    className="absolute top-3 right-3 text-2xl pointer-events-none">
+                                    className="absolute top-3 right-3 text-2xl pointer-events-none drop-shadow-lg">
                                     {s.emoji}
                                 </motion.span>
 
                                 {/* Corner decoration */}
                                 <div className={`absolute -bottom-4 -right-4 w-20 h-20
-                                                 bg-gradient-to-br ${s.grad} opacity-5 rounded-full`} />
+                                                 bg-gradient-to-br ${s.grad} opacity-10 rounded-full blur-xl`} />
                             </motion.div>
                         </TiltCard>
                     </motion.div>
@@ -191,31 +191,32 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.18 }}
-                className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                className="bg-gradient-to-br from-slate-900/95 to-purple-900/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-purple-500/30 
+                           border border-purple-500/30 overflow-hidden">
 
                 {/* Card Header */}
-                <div className="relative overflow-hidden px-6 py-5 border-b border-gray-100
-                                bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-500">
-                    <div className="absolute inset-0 opacity-10" style={{
-                        backgroundImage: `linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
-                                          linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)`,
+                <div className="relative overflow-hidden px-6 py-5 border-b border-purple-500/30
+                                bg-gradient-to-r from-purple-600 via-indigo-700 to-purple-700 shadow-xl">
+                    <div className="absolute inset-0 opacity-15" style={{
+                        backgroundImage: `linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+                                          linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)`,
                         backgroundSize: '28px 28px',
                     }} />
                     <div className="relative flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <motion.div animate={{ rotate: [0, 10, -8, 0] }} transition={{ duration: 4, repeat: Infinity }}
-                                className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                                <TrendingUp className="w-4 h-4 text-white" />
+                                className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+                                <TrendingUp className="w-4 h-4 text-white drop-shadow-sm" />
                             </motion.div>
                             <div>
-                                <h2 className="font-black text-white text-base">Event yang Anda Tangani</h2>
-                                <p className="text-teal-200 text-xs">Klik tombol Nilai untuk mulai penilaian</p>
+                                <h2 className="font-black text-white text-base drop-shadow-lg">Event yang Anda Tangani</h2>
+                                <p className="text-purple-200 text-xs backdrop-blur-sm">Klik tombol Nilai untuk mulai penilaian</p>
                             </div>
                         </div>
                         <motion.span animate={{ scale: [1, 1.06, 1] }} transition={{ duration: 2, repeat: Infinity }}
                             className="inline-flex items-center gap-1.5 bg-white/20 border border-white/30
-                                       text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                       text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm shadow-lg">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
                             {assignments.length} Event
                         </motion.span>
                     </div>
@@ -224,12 +225,12 @@ export default function JuryDashboard({ assignments, scoredThisMonth, totalScore
                 <div className="p-6">
                     {assignments.length === 0 ? (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="flex flex-col items-center py-16 text-gray-400">
+                            className="flex flex-col items-center py-16 text-slate-400">
                             <motion.div animate={{ y: [0, -8, 0], rotate: [0, 5, -3, 0] }}
                                 transition={{ duration: 4, repeat: Infinity }}
-                                className="text-6xl mb-4">⚖️</motion.div>
-                            <p className="font-semibold text-gray-500 mb-1">Belum Ada Penugasan</p>
-                            <p className="text-sm text-gray-400">Admin belum menugaskan event untuk Anda.</p>
+                                className="text-6xl mb-4 drop-shadow-2xl">⚖️</motion.div>
+                            <p className="font-semibold text-slate-300 mb-1 drop-shadow-sm">Belum Ada Penugasan</p>
+                            <p className="text-sm text-slate-400 backdrop-blur-sm">Admin belum menugaskan event untuk Anda.</p>
                         </motion.div>
                     ) : (
                         <motion.div initial="hidden" animate="show" variants={stagger} className="space-y-4">
@@ -255,24 +256,25 @@ function AssignmentCard({ assignment: a, index }) {
             onHoverStart={() => setHovered(true)}
             onHoverEnd={() => setHovered(false)}
             whileHover={{ y: -3 }}
-            className={`relative rounded-2xl border-2 overflow-hidden transition-all duration-300
-                        ${hovered ? 'border-teal-200 shadow-lg shadow-teal-100' : 'border-gray-100 shadow-sm'}`}>
+            className={`relative rounded-2xl border-2 overflow-hidden transition-all duration-300 backdrop-blur-xl shadow-lg
+                        ${hovered ? 'border-purple-400/60 shadow-2xl shadow-purple-300/40 ring-2 ring-purple-400/30' 
+                                  : 'border-purple-500/20 shadow-xl shadow-purple-200/20 ring-1 ring-purple-500/20'}`}>
 
             {/* Top accent */}
             <div className={`h-1 w-full bg-gradient-to-r transition-all duration-500
                              ${isComplete
-                                 ? 'from-emerald-400 to-teal-500'
-                                 : 'from-teal-400 to-cyan-500'}`} />
+                                 ? 'from-emerald-500 to-emerald-600'
+                                 : 'from-purple-500 to-indigo-600'}`} />
 
-            <div className="p-5 bg-white">
+            <div className="p-5 bg-gradient-to-br from-slate-900/80 to-purple-900/50 backdrop-blur-xl">
                 <div className="flex justify-between items-start gap-4 mb-4">
                     <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-800 text-sm leading-tight">{a.event?.title}</p>
+                        <p className="font-bold text-slate-100 text-sm leading-tight drop-shadow-sm">{a.event?.title}</p>
                         {a.category && (
                             <span className="inline-flex items-center gap-1 mt-1.5 text-xs
-                                             bg-teal-50 text-teal-700 border border-teal-100
-                                             px-2.5 py-0.5 rounded-full font-semibold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                                             bg-gradient-to-r from-purple-500/20 to-indigo-600/20 text-purple-300 border border-purple-400/40
+                                             px-2.5 py-0.5 rounded-full font-semibold backdrop-blur-sm shadow-lg">
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
                                 {a.category.name}
                             </span>
                         )}
@@ -280,10 +282,10 @@ function AssignmentCard({ assignment: a, index }) {
 
                     <motion.div whileHover={{ scale: 1.05, y: -1 }} whileTap={{ scale: 0.96 }}>
                         <Link href={route('jury.submissions.index', a.event.id)}
-                            className="flex items-center gap-1.5 bg-gradient-to-r from-teal-500
-                                       to-cyan-500 text-white text-xs font-bold px-4 py-2.5
-                                       rounded-xl shadow-md shadow-teal-200 hover:shadow-teal-300
-                                       transition-all duration-200 shrink-0">
+                            className="flex items-center gap-1.5 bg-gradient-to-r from-purple-600
+                                       to-indigo-600 text-white text-xs font-bold px-4 py-2.5
+                                       rounded-xl shadow-xl shadow-purple-300/40 hover:shadow-2xl hover:shadow-purple-400/50
+                                       transition-all duration-200 shrink-0 backdrop-blur-xl border border-white/20">
                             Nilai
                             <ChevronRight className="w-3.5 h-3.5" />
                         </Link>
@@ -293,23 +295,23 @@ function AssignmentCard({ assignment: a, index }) {
                 {/* Progress */}
                 {a.progress && (
                     <div>
-                        <div className="flex justify-between text-xs text-gray-400 mb-2">
+                        <div className="flex justify-between text-xs text-slate-400 mb-2">
                             <span className="font-medium">Progres Penilaian</span>
-                            <span className={`font-bold ${isComplete ? 'text-emerald-600' : 'text-teal-600'}`}>
+                            <span className={`font-bold ${isComplete ? 'text-emerald-400' : 'text-purple-300'}`}>
                                 {a.progress.scored_submissions}/{a.progress.total_submissions} karya
                                 &nbsp;· {pct}%
                             </span>
                         </div>
 
-                        <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                        <div className="w-full bg-gradient-to-r from-slate-800/50 to-purple-800/30 rounded-full h-2.5 overflow-hidden border border-purple-500/30">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${pct}%` }}
                                 transition={{ duration: 0.8, delay: index * 0.1, ease: 'easeOut' }}
-                                className={`h-2.5 rounded-full bg-gradient-to-r
+                                className={`h-2.5 rounded-full bg-gradient-to-r shadow-lg
                                             ${isComplete
-                                                ? 'from-emerald-400 to-teal-500'
-                                                : 'from-teal-400 to-cyan-500'}`} />
+                                                ? 'from-emerald-500 to-emerald-600 shadow-emerald-400/50'
+                                                : 'from-purple-500 to-indigo-600 shadow-purple-400/50'}`} />
                         </div>
 
                         <AnimatePresence>
@@ -317,13 +319,13 @@ function AssignmentCard({ assignment: a, index }) {
                                 <motion.p
                                     initial={{ opacity: 0, y: 4 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="flex items-center gap-1.5 text-xs text-emerald-600
-                                               font-bold mt-2">
+                                    className="flex items-center gap-1.5 text-xs text-emerald-400
+                                               font-bold mt-2 backdrop-blur-sm drop-shadow-sm">
                                     <motion.span
                                         animate={{ scale: [1, 1.2, 1] }}
                                         transition={{ duration: 1.5, repeat: Infinity }}
                                         className="w-4 h-4 bg-emerald-500 rounded-full flex items-center
-                                                   justify-center text-white text-[10px]">
+                                                   justify-center text-white text-[10px] shadow-lg">
                                         ✓
                                     </motion.span>
                                     Semua karya sudah dinilai! 🎉

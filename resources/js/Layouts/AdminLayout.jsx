@@ -1,336 +1,318 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/Assets/logo.png';
 import {
-    LayoutDashboard, CalendarDays, Users, ClipboardList,
-    Image, Megaphone, BarChart3, LogOut,
-    PanelLeftClose, PanelLeftOpen,
+    LayoutDashboard, CalendarDays, Users, ClipboardList, Image, Megaphone,
+    BarChart3, LogOut, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle
 } from "lucide-react";
 
 const navItems = [
-    { label: 'Dashboard',   href: 'admin.dashboard',           icon: LayoutDashboard, color: 'text-indigo-400' },
-    { label: 'Event',       href: 'admin.events.index',        icon: CalendarDays,    color: 'text-blue-400'   },
-    { label: 'Pengguna',    href: 'admin.users.index',         icon: Users,           color: 'text-violet-400' },
-    { label: 'Pendaftaran', href: 'admin.registrations.index', icon: ClipboardList,   color: 'text-cyan-400'   },
-    { label: 'Karya',       href: 'admin.submissions.index',   icon: Image,           color: 'text-teal-400'   },
-    { label: 'Pengumuman',  href: 'admin.announcements.index', icon: Megaphone,       color: 'text-amber-400'  },
-    { label: 'Laporan',     href: 'admin.reports.index',       icon: BarChart3,       color: 'text-emerald-400'},
+    { label: 'Dashboard',    href: 'admin.dashboard',            icon: LayoutDashboard },
+    { label: 'Event',        href: 'admin.events.index',         icon: CalendarDays    },
+    { label: 'Pengguna',     href: 'admin.users.index',          icon: Users           },
+    { label: 'Pendaftaran',  href: 'admin.registrations.index',  icon: ClipboardList   },
+    { label: 'Karya',        href: 'admin.submissions.index',    icon: Image           },
+    { label: 'Pengumuman',   href: 'admin.announcements.index',  icon: Megaphone       },
+    { label: 'Laporan',      href: 'admin.reports.index',        icon: BarChart3       },
 ];
 
 export default function AdminLayout({ children, header }) {
-    const { auth = { user: null }, flash = {} } = usePage().props;
+    const { auth = {}, flash = {} } = usePage().props;
     const [collapsed, setCollapsed] = useState(false);
-    const [flashVisible, setFlash]  = useState(true);
-    const [currentTime, setTime]    = useState(new Date());
-    const [hoverNav, setHoverNav]   = useState(null);
+    const [time, setTime]           = useState(new Date());
+    const [showFlash, setShowFlash] = useState(false);
 
     useEffect(() => {
-        const t = setInterval(() => setTime(new Date()), 60000);
-        return () => clearInterval(t);
+        const i = setInterval(() => setTime(new Date()), 30000);
+        return () => clearInterval(i);
     }, []);
 
     useEffect(() => {
-        setFlash(true);
-        const t = setTimeout(() => setFlash(false), 4000);
-        return () => clearTimeout(t);
-    }, [flash?.success, flash?.error]);
+        if (flash.success || flash.error) {
+            setShowFlash(true);
+            const t = setTimeout(() => setShowFlash(false), 5000);
+            return () => clearTimeout(t);
+        }
+    }, [flash.success, flash.error]);
 
-    const greeting = () => {
-        const h = currentTime.getHours();
-        if (h < 12) return 'Selamat Pagi';
-        if (h < 15) return 'Selamat Siang';
-        if (h < 18) return 'Selamat Sore';
-        return 'Selamat Malam';
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post(route('logout'));
     };
 
     return (
-        <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+        <div className="h-screen flex overflow-hidden" style={{ background: '#070714', fontFamily: "'DM Sans', sans-serif" }}>
 
-            {/* ══════════════════════════════════════
-                SIDEBAR WRAPPER — overflow visible
-                agar tombol collapse tidak terpotong
-            ══════════════════════════════════════ */}
-            <div className="relative shrink-0 flex" style={{ zIndex: 30 }}>
-                <motion.aside
-                    animate={{ width: collapsed ? 72 : 256 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex flex-col h-screen
-                               bg-slate-900 border-r border-slate-700/50 overflow-hidden">
+            {/* ══════════════════ SIDEBAR ══════════════════ */}
+            <motion.aside
+                animate={{ width: collapsed ? 72 : 260 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative flex flex-col h-screen shrink-0 overflow-hidden z-40"
+                style={{
+                    background: 'linear-gradient(170deg, #0d0b2b 0%, #120e3a 50%, #0d0b2b 100%)',
+                    borderRight: '1px solid rgba(99,102,241,0.12)',
+                    boxShadow: '4px 0 32px rgba(79,70,229,0.15)',
+                }}
+            >
+                {/* Ambient glow top */}
+                <div className="absolute top-0 left-0 right-0 h-48 pointer-events-none"
+                    style={{ background: 'radial-gradient(ellipse at 50% -20%, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
+                {/* Grid texture */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),
+                                          linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)`,
+                        backgroundSize: '32px 32px',
+                    }} />
 
-                    {/* Sidebar top glow */}
-                    <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b
-                                    from-indigo-600/20 to-transparent pointer-events-none" />
+                {/* ── Logo ── */}
+                <div className="relative z-10 flex items-center px-5 py-5 shrink-0"
+                    style={{ borderBottom: '1px solid rgba(99,102,241,0.1)' }}>
+                    <motion.div
+                        whileHover={{ scale: 1.06 }}
+                        className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center p-1.5"
+                        style={{
+                            background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                            boxShadow: '0 0 20px rgba(99,102,241,0.6)',
+                        }}
+                    >
+                        <div className="w-full h-full bg-white/90 rounded-lg flex items-center justify-center">
+                            <img src={Logo} className="w-5 h-5 object-contain" alt="Logo" />
+                        </div>
+                    </motion.div>
 
-                    {/* ── Logo ── */}
-                    <div className={`relative z-10 flex items-center border-b border-slate-700/50
-                                     py-4 transition-all duration-300
-                                     ${collapsed ? 'px-3 justify-center' : 'px-4 gap-3'}`}>
-                        <motion.img
-                            src={Logo}
-                            animate={{ width: collapsed ? 34 : 40 }}
-                            transition={{ duration: 0.3 }}
-                            className="object-contain shrink-0 rounded-xl"
-                        />
-                        <AnimatePresence>
-                            {!collapsed && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -8 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -8 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="leading-tight min-w-0">
-                                    <p className="font-black text-white text-sm whitespace-nowrap">
-                                        Kite Competition
-                                    </p>
-                                    <p className="text-indigo-400 text-[11px] font-medium">
-                                        Admin Panel
-                                    </p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* ── Nav ── */}
-                    <nav className="relative z-10 flex-1 py-3 space-y-0.5 px-2
-                                    overflow-y-auto overflow-x-hidden">
-                        {navItems.map((item) => {
-                            const active = route().current(item.href);
-                            return (
-                                <div key={item.href} className="relative group/nav">
-                                    <Link href={route(item.href)}>
-                                        <motion.div
-                                            whileHover={{ x: collapsed ? 0 : 3 }}
-                                            whileTap={{ scale: 0.97 }}
-                                            onHoverStart={() => setHoverNav(item.href)}
-                                            onHoverEnd={() => setHoverNav(null)}
-                                            className={`relative flex items-center rounded-xl
-                                                transition-all duration-200 cursor-pointer
-                                                ${collapsed
-                                                    ? 'justify-center px-0 py-3'
-                                                    : 'gap-3 px-3 py-2.5'}
-                                                ${active
-                                                    ? 'bg-indigo-600 shadow-lg shadow-indigo-900/40'
-                                                    : 'hover:bg-slate-800/80'}`}>
-
-                                            {/* Active bar kiri */}
-                                            {active && (
-                                                <motion.div
-                                                    layoutId="adminActiveNav"
-                                                    className="absolute left-0 top-1/2 -translate-y-1/2
-                                                               w-1 h-6 bg-indigo-300 rounded-r-full"
-                                                />
-                                            )}
-
-                                            <item.icon
-                                                size={18}
-                                                className={`shrink-0 transition-colors
-                                                    ${active ? 'text-white' : item.color}`}
-                                            />
-
-                                            <AnimatePresence>
-                                                {!collapsed && (
-                                                    <motion.span
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        transition={{ duration: 0.15 }}
-                                                        className={`text-sm font-medium whitespace-nowrap
-                                                            ${active ? 'text-white' : 'text-slate-300'}`}>
-                                                        {item.label}
-                                                    </motion.span>
-                                                )}
-                                            </AnimatePresence>
-                                        </motion.div>
-                                    </Link>
-                                </div>
-                            );
-                        })}
-                    </nav>
-
-                    {/* ── User info + Logout ── */}
-                    <div className="relative z-10 border-t border-slate-700/50 p-3 space-y-2">
-                        <AnimatePresence>
-                            {!collapsed && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden">
-                                    <div className="flex items-center gap-3 px-2 py-2 rounded-xl
-                                                    bg-slate-800 border border-slate-700/50 mb-2">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br
-                                                        from-indigo-500 to-blue-600 flex items-center
-                                                        justify-center text-white text-sm font-bold shrink-0">
-                                            {auth.user?.name?.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-white text-sm font-semibold truncate">
-                                                {auth.user?.name}
-                                            </p>
-                                            <p className="text-slate-400 text-xs">Administrator</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <Link href={route('logout')} method="post" as="button" className="w-full">
+                    <AnimatePresence>
+                        {!collapsed && (
                             <motion.div
-                                whileHover={{ backgroundColor: 'rgba(239,68,68,0.12)' }}
-                                whileTap={{ scale: 0.96 }}
-                                className={`flex items-center rounded-xl py-2.5 text-slate-400
-                                            hover:text-red-400 transition-all duration-200 cursor-pointer
-                                            ${collapsed ? 'justify-center px-0' : 'gap-3 px-3'}`}>
-                                <LogOut size={17} className="shrink-0" />
-                                <AnimatePresence>
-                                    {!collapsed && (
-                                        <motion.span
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="text-sm font-medium">
-                                            Keluar
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
-                            </motion.div>
-                        </Link>
-                    </div>
-                </motion.aside>
-
-                {/* ══ TOMBOL COLLAPSE ══
-                    Diletakkan di LUAR aside (sibling),
-                    sehingga tidak terpotong overflow-hidden  */}
-                <motion.button
-                    onClick={() => setCollapsed(!collapsed)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    title={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
-                    className="absolute right-0 top-[70px] translate-x-1/2 z-50
-                               w-8 h-8 rounded-full
-                               bg-slate-800 border-2 border-slate-600
-                               flex items-center justify-center shadow-xl shadow-black/30
-                               text-slate-300 hover:text-white
-                               hover:bg-indigo-600 hover:border-indigo-500
-                               transition-all duration-200">
-                    <AnimatePresence mode="wait">
-                        {collapsed ? (
-                            <motion.div key="open"
-                                initial={{ opacity: 0, scale: 0.6 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.6 }}
-                                transition={{ duration: 0.15 }}>
-                                <PanelLeftOpen size={14} />
-                            </motion.div>
-                        ) : (
-                            <motion.div key="close"
-                                initial={{ opacity: 0, scale: 0.6 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.6 }}
-                                transition={{ duration: 0.15 }}>
-                                <PanelLeftClose size={14} />
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="ml-3 min-w-0"
+                            >
+                                <p className="font-black text-white text-sm leading-tight tracking-tight">Admin Panel</p>
+                                <p className="text-[10px] font-semibold mt-0.5" style={{ color: 'rgba(99,102,241,0.7)' }}>Management System</p>
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </motion.button>
-            </div>
+                </div>
 
-            {/* ══════════════════════════════════════
-                MAIN CONTENT
-            ══════════════════════════════════════ */}
-            <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+                {/* ── Nav ── */}
+                <nav className="relative z-10 flex-1 px-3 py-4 space-y-0.5 overflow-y-auto overflow-x-hidden">
+                    <AnimatePresence>
+                        {!collapsed && (
+                            <motion.p
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="text-[10px] font-bold uppercase tracking-widest px-3 mb-3"
+                                style={{ color: 'rgba(99,102,241,0.4)' }}>
+                                Navigasi
+                            </motion.p>
+                        )}
+                    </AnimatePresence>
+
+                    {navItems.map((item, i) => {
+                        const active = route().current(item.href);
+                        return (
+                            <motion.div key={item.href}
+                                initial={{ opacity: 0, x: -16 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+                                <Link href={route(item.href)}
+                                    className={`relative flex items-center rounded-xl transition-all duration-200 group overflow-hidden
+                                                ${collapsed ? 'justify-center px-0 py-3.5' : 'gap-3.5 px-4 py-3'}`}
+                                    style={active ? {
+                                        background: 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(124,58,237,0.15))',
+                                        boxShadow: 'inset 0 0 0 1px rgba(99,102,241,0.35), 0 4px 16px rgba(99,102,241,0.15)',
+                                        color: '#c7d2fe',
+                                    } : { color: 'rgba(148,163,184,0.7)' }}
+                                    onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; if (!active) e.currentTarget.style.color = '#c7d2fe'; }}
+                                    onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; if (!active) e.currentTarget.style.color = 'rgba(148,163,184,0.7)'; }}
+                                >
+                                    {/* Active side glow */}
+                                    {active && (
+                                        <motion.div layoutId="adminActiveNav"
+                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 rounded-r-full"
+                                            style={{ background: 'linear-gradient(to bottom, #818cf8, #a78bfa)' }} />
+                                    )}
+
+                                    {/* Icon container */}
+                                    <div className={`relative shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${collapsed ? 'w-9 h-9 rounded-xl' : ''}`}
+                                        style={active ? {
+                                            background: 'rgba(99,102,241,0.3)',
+                                            boxShadow: '0 0 12px rgba(99,102,241,0.3)',
+                                        } : { background: 'rgba(255,255,255,0.04)' }}>
+                                        <item.icon size={16} />
+                                        {active && (
+                                            <motion.div className="absolute inset-0 rounded-lg"
+                                                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                                style={{ background: 'rgba(99,102,241,0.2)' }} />
+                                        )}
+                                    </div>
+
+                                    <AnimatePresence>
+                                        {!collapsed && (
+                                            <motion.span
+                                                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.2 }}
+                                                className="text-sm font-semibold tracking-wide truncate">
+                                                {item.label}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {active && !collapsed && (
+                                        <motion.div className="ml-auto w-1.5 h-1.5 rounded-full shrink-0"
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                            style={{ background: '#818cf8' }} />
+                                    )}
+                                </Link>
+                            </motion.div>
+                        );
+                    })}
+                </nav>
+
+                {/* ── Footer: logout ── */}
+                <div className="relative z-10 px-3 py-4 shrink-0"
+                    style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}>
+                    <button onClick={handleLogout} className="w-full">
+                        <div className={`flex items-center rounded-xl transition-all duration-200 cursor-pointer
+                                          ${collapsed ? 'justify-center py-3.5 px-0' : 'gap-3.5 px-4 py-3'}`}
+                            style={{ color: 'rgba(252,165,165,0.6)' }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#fca5a5'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(252,165,165,0.6)'; }}
+                        >
+                            <div className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0"
+                                style={{ background: 'rgba(239,68,68,0.1)' }}>
+                                <LogOut size={15} />
+                            </div>
+                            <AnimatePresence>
+                                {!collapsed && (
+                                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                        className="text-sm font-semibold">Keluar</motion.span>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Collapse toggle */}
+                <motion.button
+                    onClick={() => setCollapsed(v => !v)}
+                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
+                    className="absolute top-[76px] -right-3.5 w-7 h-7 rounded-full flex items-center justify-center z-50 transition-all duration-200"
+                    style={{
+                        background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                        boxShadow: '0 0 16px rgba(99,102,241,0.5)',
+                        border: '2px solid rgba(255,255,255,0.15)',
+                    }}>
+                    <AnimatePresence mode="wait">
+                        <motion.div key={collapsed ? 'r' : 'l'}
+                            initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }}
+                            exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.15 }}>
+                            {collapsed
+                                ? <ChevronRight size={12} className="text-white" />
+                                : <ChevronLeft size={12} className="text-white" />}
+                        </motion.div>
+                    </AnimatePresence>
+                </motion.button>
+            </motion.aside>
+
+            {/* ══════════════════ MAIN ══════════════════ */}
+            <div className="flex-1 flex flex-col overflow-hidden min-w-0"
+                style={{ background: 'linear-gradient(145deg, #0b0920 0%, #0f0d2e 50%, #080720 100%)' }}>
 
                 {/* Topbar */}
-                <header className="bg-white border-b border-gray-100 px-6 py-3.5
-                                   flex items-center justify-between shrink-0 shadow-sm">
-                    <div>
-                        <h1 className="text-base font-bold text-gray-800">{header}</h1>
-                        <p className="text-xs text-gray-400">
-                            {greeting()}, {auth.user?.name?.split(' ')[0]} 👋
-                        </p>
-                    </div>
-
+                <motion.header
+                    initial={{ y: -60, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex items-center justify-between px-8 py-4 shrink-0"
+                    style={{
+                        background: 'rgba(13,11,43,0.85)',
+                        backdropFilter: 'blur(24px)',
+                        borderBottom: '1px solid rgba(99,102,241,0.1)',
+                        boxShadow: '0 4px 32px rgba(0,0,0,0.3)',
+                    }}
+                >
+                    {/* Page title */}
                     <div className="flex items-center gap-3">
-                        <div className="hidden md:block text-right">
-                            <p className="text-xs font-semibold text-gray-700">
-                                {currentTime.toLocaleTimeString('id-ID', {
-                                    hour: '2-digit', minute: '2-digit'
-                                })}
-                            </p>
-                            <p className="text-[10px] text-gray-400">
-                                {currentTime.toLocaleDateString('id-ID', {
-                                    weekday: 'long', day: 'numeric', month: 'long'
-                                })}
-                            </p>
-                        </div>
-
-                        <div className="w-px h-8 bg-gray-100 hidden md:block" />
-
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br
-                                            from-indigo-500 to-blue-600 flex items-center
-                                            justify-center text-white text-sm font-bold
-                                            shadow-md shadow-indigo-200 shrink-0">
-                                {auth.user?.name?.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="hidden md:block">
-                                <p className="text-sm font-semibold text-gray-800 leading-none">
-                                    {auth.user?.name}
-                                </p>
-                                <p className="text-[11px] text-indigo-500 font-medium mt-0.5">
-                                    Administrator
-                                </p>
+                        <div className="w-1 h-8 rounded-full"
+                            style={{ background: 'linear-gradient(to bottom, #6366f1, #7c3aed)' }} />
+                        <div>
+                            <h1 className="text-lg font-black text-white tracking-tight">{header}</h1>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <Clock size={10} style={{ color: 'rgba(99,102,241,0.6)' }} />
+                                <span className="text-[10px] font-medium" style={{ color: 'rgba(99,102,241,0.6)' }}>
+                                    {time.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
                             </div>
                         </div>
                     </div>
-                </header>
+
+                    {/* User info */}
+                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
+                        style={{
+                            background: 'rgba(99,102,241,0.08)',
+                            border: '1px solid rgba(99,102,241,0.15)',
+                        }}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-sm"
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                                boxShadow: '0 0 12px rgba(99,102,241,0.4)',
+                            }}>
+                            {auth.user?.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <div className="hidden lg:block">
+                            <p className="text-sm font-bold text-white leading-none">{auth.user?.name}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                <p className="text-[10px] font-semibold text-emerald-400">Administrator</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.header>
 
                 {/* Flash messages */}
                 <AnimatePresence>
-                    {flashVisible && flash?.success && (
+                    {showFlash && (flash.success || flash.error) && (
                         <motion.div
-                            initial={{ opacity: 0, y: -16, height: 0 }}
-                            animate={{ opacity: 1, y: 0, height: 'auto' }}
-                            exit={{ opacity: 0, y: -16, height: 0 }}
-                            className="mx-6 mt-4 overflow-hidden">
-                            <div className="flex items-center gap-3 p-3.5 bg-emerald-50
-                                            border border-emerald-200 text-emerald-800
-                                            rounded-2xl text-sm font-medium shadow-sm">
-                                <div className="w-5 h-5 bg-emerald-500 rounded-full flex
-                                                items-center justify-center text-white
-                                                text-xs shrink-0 font-bold">✓</div>
-                                {flash.success}
-                            </div>
-                        </motion.div>
-                    )}
-                    {flashVisible && flash?.error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -16, height: 0 }}
-                            animate={{ opacity: 1, y: 0, height: 'auto' }}
-                            exit={{ opacity: 0, y: -16, height: 0 }}
-                            className="mx-6 mt-4 overflow-hidden">
-                            <div className="flex items-center gap-3 p-3.5 bg-red-50
-                                            border border-red-200 text-red-800
-                                            rounded-2xl text-sm font-medium shadow-sm">
-                                <div className="w-5 h-5 bg-red-500 rounded-full flex
-                                                items-center justify-center text-white
-                                                text-xs shrink-0 font-bold">✕</div>
-                                {flash.error}
+                            initial={{ opacity: 0, y: -16, scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -16, scale: 0.97 }}
+                            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                            className="mx-8 mt-4 shrink-0"
+                        >
+                            <div className="flex items-center gap-3 px-5 py-4 rounded-2xl"
+                                style={flash.success ? {
+                                    background: 'rgba(16,185,129,0.1)',
+                                    border: '1px solid rgba(16,185,129,0.25)',
+                                    boxShadow: '0 4px 24px rgba(16,185,129,0.1)',
+                                } : {
+                                    background: 'rgba(239,68,68,0.1)',
+                                    border: '1px solid rgba(239,68,68,0.25)',
+                                    boxShadow: '0 4px 24px rgba(239,68,68,0.1)',
+                                }}>
+                                {flash.success
+                                    ? <CheckCircle size={18} className="text-emerald-400 shrink-0" />
+                                    : <AlertCircle size={18} className="text-red-400 shrink-0" />}
+                                <p className="text-sm font-semibold" style={{ color: flash.success ? '#6ee7b7' : '#fca5a5' }}>
+                                    {flash.success || flash.error}
+                                </p>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 {/* Content */}
-                <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
+                <main className="flex-1 overflow-y-auto p-8 pb-12">
                     <motion.div
                         key={header}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35 }}>
+                        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
                         {children}
                     </motion.div>
                 </main>
