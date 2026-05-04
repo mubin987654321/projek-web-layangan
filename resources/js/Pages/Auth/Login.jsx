@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Masuk - Kite Competition" />
+            <Head title="Website Layangan" />
 
             <div className="min-h-screen flex items-center justify-center p-4
                            bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950
