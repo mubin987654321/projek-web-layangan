@@ -29,25 +29,23 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
 
-            {/* ═══════════════════════════════════════
-                FLOATING NAVBAR
-            ═══════════════════════════════════════ */}
+            {/* ══════════════ FLOATING NAVBAR ══════════════ */}
             <motion.header
                 initial={{ y: -80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="sticky top-0 z-50 px-4 pt-3 pb-2">
-
+                className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-2"
+            >
                 <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl rounded-2xl
                                 border border-white/60 shadow-lg shadow-black/5
-                                px-5 py-3 flex justify-between items-center">
+                                px-4 sm:px-5 py-3 flex justify-between items-center">
 
                     {/* ── Left: Logo + Nav ── */}
-                    <div className="flex items-center gap-6">
-                        <Link href="/" className="flex items-center gap-2.5 group">
+                    <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+                        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
                             <motion.img
                                 src={Logo}
-                                className="w-9 h-9 object-contain"
+                                className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
                                 whileHover={{ rotate: 8, scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300 }}
                             />
@@ -73,7 +71,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     {/* ── Right: User + Mobile Toggle ── */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
 
                         {/* User Dropdown */}
                         <Dropdown>
@@ -81,7 +79,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl
+                                    className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-3 py-2 rounded-xl
                                                hover:bg-gray-50 border border-transparent
                                                hover:border-gray-200 transition-all duration-200 group">
 
@@ -92,9 +90,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                         {user?.name?.charAt(0).toUpperCase()}
                                     </div>
 
-                                    {/* Name + role */}
+                                    {/* Name + role — hidden on very small screens */}
                                     <div className="hidden sm:block text-left">
-                                        <p className="text-sm font-bold text-gray-800 leading-none">
+                                        <p className="text-sm font-bold text-gray-800 leading-none truncate max-w-[120px]">
                                             {user?.name}
                                         </p>
                                         <span className={`inline-flex items-center gap-1 text-[10px]
@@ -113,7 +111,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {/* Header in dropdown */}
                                 <div className="px-4 py-3 border-b border-gray-100">
                                     <p className="text-sm font-bold text-gray-800">{user?.name}</p>
-                                    <p className="text-xs text-gray-400 mt-0.5">{user?.email}</p>
+                                    <p className="text-xs text-gray-400 mt-0.5 truncate">{user?.email}</p>
                                 </div>
 
                                 <Dropdown.Link href={route('profile.edit')}>
@@ -166,12 +164,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
                                 <div className={`w-10 h-10 bg-gradient-to-br ${roleColor}
                                                  rounded-xl flex items-center justify-center
-                                                 text-white font-bold text-sm shadow-md`}>
+                                                 text-white font-bold text-sm shadow-md shrink-0`}>
                                     {user?.name?.charAt(0).toUpperCase()}
                                 </div>
-                                <div>
-                                    <p className="font-bold text-gray-800 text-sm">{user?.name}</p>
-                                    <p className="text-xs text-gray-400">{user?.email}</p>
+                                <div className="min-w-0">
+                                    <p className="font-bold text-gray-800 text-sm truncate">{user?.name}</p>
+                                    <p className="text-xs text-gray-400 truncate">{user?.email}</p>
                                 </div>
                             </div>
 
@@ -206,35 +204,30 @@ export default function AuthenticatedLayout({ header, children }) {
                 </AnimatePresence>
             </motion.header>
 
-            {/* ═══════════════════════════════════════
-                PAGE HEADER
-            ═══════════════════════════════════════ */}
+            {/* ══════════════ PAGE HEADER ══════════════ */}
             {header && (
                 <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.5 }}
-                    className="max-w-7xl mx-auto px-4 mt-4">
+                    className="max-w-7xl mx-auto px-3 sm:px-4 mt-3 sm:mt-4">
                     <div className="bg-white/60 backdrop-blur-sm border border-white/60
-                                    rounded-2xl shadow-sm px-6 py-4">
-                        <div className="text-base font-bold text-gray-800 flex items-center gap-2">
+                                    rounded-2xl shadow-sm px-4 sm:px-6 py-3 sm:py-4">
+                        <div className="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2">
                             {header}
                         </div>
                     </div>
                 </motion.div>
             )}
 
-            {/* ═══════════════════════════════════════
-                MAIN CONTENT
-            ═══════════════════════════════════════ */}
+            {/* ══════════════ MAIN CONTENT ══════════════ */}
             <motion.main
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="max-w-7xl mx-auto px-4 py-6">
+                className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
                 {children}
             </motion.main>
-
         </div>
     );
 }

@@ -17,14 +17,16 @@ const navItems = [
 export default function UserLayout({ children }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
+
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isMobile, setIsMobile]       = useState(true);   // default safe
 
     useEffect(() => {
         const check = () => {
             const mobile = window.innerWidth < 768;
             setIsMobile(mobile);
-            if (mobile) setSidebarOpen(false);
+            // Keep sidebar open on desktop by default, closed on mobile
+            setSidebarOpen(!mobile);
         };
         check();
         window.addEventListener('resize', check);
@@ -37,14 +39,18 @@ export default function UserLayout({ children }) {
     };
 
     return (
-        <div className="flex min-h-screen" style={{ background: '#f0f0f8', fontFamily: "'DM Sans', sans-serif" }}>
-
+        <div
+            className="flex min-h-screen"
+            style={{ background: '#f0f0f8', fontFamily: "'DM Sans', sans-serif" }}
+        >
             {/* ── Mobile overlay ── */}
             <AnimatePresence>
                 {isMobile && sidebarOpen && (
                     <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
                         onClick={() => setSidebarOpen(false)}
                     />
                 )}
@@ -54,25 +60,25 @@ export default function UserLayout({ children }) {
             <AnimatePresence>
                 {sidebarOpen && (
                     <motion.aside
-                        initial={{ x: -280, opacity: 0 }}
+                        initial={{ x: -288, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -280, opacity: 0 }}
+                        exit={{ x: -288, opacity: 0 }}
                         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                        className={`w-72 flex flex-col h-screen sticky top-0 z-50 overflow-hidden
-                                    ${isMobile ? 'fixed' : ''}`}
+                        /* On desktop: sticky (takes up flow). On mobile: fixed drawer */
+                        className={`w-72 flex flex-col h-screen z-50 overflow-hidden shrink-0
+                                    ${isMobile ? 'fixed top-0 left-0' : 'sticky top-0'}`}
                         style={{
                             background: 'linear-gradient(170deg, #0f0c29 0%, #302b63 60%, #24243e 100%)',
                             boxShadow: '8px 0 40px rgba(79,70,229,0.25)',
                         }}
                     >
-                        {/* Grid texture overlay */}
+                        {/* Grid texture */}
                         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
                             style={{
                                 backgroundImage: `linear-gradient(rgba(255,255,255,0.8) 1px,transparent 1px),
                                                   linear-gradient(90deg,rgba(255,255,255,0.8) 1px,transparent 1px)`,
                                 backgroundSize: '32px 32px',
                             }} />
-
                         {/* Purple glow orbs */}
                         <div className="absolute -top-20 -right-10 w-56 h-56 rounded-full pointer-events-none opacity-20"
                             style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }} />
@@ -80,34 +86,43 @@ export default function UserLayout({ children }) {
                             style={{ background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)' }} />
 
                         {/* ── Logo ── */}
-                        <div className="relative z-10 flex items-center gap-3.5 px-6 py-6 shrink-0"
+                        <div className="relative z-10 flex items-center gap-3 px-6 py-5 shrink-0"
                             style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                             <motion.div
                                 whileHover={{ scale: 1.06, rotate: 3 }}
-                                className="w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center p-1.5 shadow-xl"
+                                className="w-11 h-11 rounded-2xl shrink-0 flex items-center justify-center p-1.5 shadow-xl"
                                 style={{
                                     background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
                                     boxShadow: '0 8px 24px rgba(99,102,241,0.5)',
                                 }}
                             >
                                 <div className="w-full h-full bg-white/90 rounded-xl flex items-center justify-center">
-                                    <img src={Logo} className="w-7 h-7 object-contain" alt="Logo" />
+                                    <img src={Logo} className="w-6 h-6 object-contain" alt="Logo" />
                                 </div>
                             </motion.div>
-                            <div>
-                                <h1 className="font-black text-white text-base leading-tight tracking-tight">
+                            <div className="flex-1 min-w-0">
+                                <h1 className="font-black text-white text-sm leading-tight tracking-tight">
                                     Lomba Layangan
                                 </h1>
-                                <p className="text-indigo-300/70 text-xs font-medium mt-0.5">
-                                    Portal Peserta
-                                </p>
+                                <p className="text-indigo-300/70 text-xs font-medium mt-0.5">Portal Peserta</p>
                             </div>
+                            {/* Close — mobile drawer */}
+                            {isMobile && (
+                                <button
+                                    onClick={() => setSidebarOpen(false)}
+                                    className="w-8 h-8 flex items-center justify-center rounded-xl shrink-0"
+                                    style={{ background: 'rgba(99,102,241,0.2)', color: '#c7d2fe' }}
+                                >
+                                    <X size={15} />
+                                </button>
+                            )}
                         </div>
 
                         {/* ── Nav ── */}
                         <nav className="relative z-10 flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-                            <p className="text-indigo-400/50 text-[10px] font-bold uppercase tracking-widest
-                                          px-3 mb-3">Menu Utama</p>
+                            <p className="text-indigo-400/50 text-[10px] font-bold uppercase tracking-widest px-3 mb-3">
+                                Menu Utama
+                            </p>
                             {navItems.map((item, i) => {
                                 const active = route().current(item.href);
                                 return (
@@ -126,29 +141,20 @@ export default function UserLayout({ children }) {
                                                 background: 'linear-gradient(135deg, rgba(99,102,241,0.35), rgba(124,58,237,0.25))',
                                                 color: '#fff',
                                                 boxShadow: 'inset 0 0 0 1px rgba(99,102,241,0.4)',
-                                            } : {
-                                                color: 'rgba(199,210,254,0.7)',
-                                            }}
+                                            } : { color: 'rgba(199,210,254,0.7)' }}
                                         >
-                                            {/* Hover fill */}
                                             <motion.div
                                                 className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                                 style={{ background: 'rgba(99,102,241,0.12)' }}
                                             />
-
-                                            {/* Icon */}
                                             <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200"
                                                 style={active ? {
                                                     background: 'rgba(99,102,241,0.5)',
                                                     boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
-                                                } : {
-                                                    background: 'rgba(255,255,255,0.06)',
-                                                }}>
+                                                } : { background: 'rgba(255,255,255,0.06)' }}>
                                                 <item.icon size={17} />
                                             </div>
-
                                             <span className="relative z-10">{item.label}</span>
-
                                             {active && (
                                                 <motion.div
                                                     layoutId="activeNav"
@@ -167,7 +173,6 @@ export default function UserLayout({ children }) {
                         {/* ── User section ── */}
                         <div className="relative z-10 px-3 py-4 shrink-0"
                             style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-
                             {/* Profile card */}
                             <div className="flex items-center gap-3 px-3 py-3 rounded-2xl mb-2"
                                 style={{ background: 'rgba(255,255,255,0.04)' }}>
@@ -191,13 +196,14 @@ export default function UserLayout({ children }) {
                             {/* Actions */}
                             <div className="space-y-1">
                                 <Link href={route('profile.edit')}
+                                    onClick={() => isMobile && setSidebarOpen(false)}
                                     className="flex items-center gap-3 px-4 py-2.5 rounded-xl
-                                               text-sm font-medium transition-all duration-200 group"
+                                               text-sm font-medium transition-all duration-200"
                                     style={{ color: 'rgba(199,210,254,0.7)' }}
                                     onMouseEnter={e => e.currentTarget.style.color = '#fff'}
                                     onMouseLeave={e => e.currentTarget.style.color = 'rgba(199,210,254,0.7)'}
                                 >
-                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200"
+                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center"
                                         style={{ background: 'rgba(255,255,255,0.06)' }}>
                                         <User size={14} />
                                     </div>
@@ -232,7 +238,7 @@ export default function UserLayout({ children }) {
                     initial={{ y: -60, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    className="sticky top-0 z-30 flex items-center gap-4 px-6 py-3.5"
+                    className="sticky top-0 z-30 flex items-center gap-3 px-4 md:px-6 py-3"
                     style={{
                         background: 'rgba(240,240,248,0.92)',
                         backdropFilter: 'blur(20px)',
@@ -245,7 +251,7 @@ export default function UserLayout({ children }) {
                         onClick={() => setSidebarOpen(v => !v)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl shrink-0 transition-all duration-200"
+                        className="w-9 h-9 flex items-center justify-center rounded-xl shrink-0 transition-all duration-200"
                         style={{
                             background: 'white',
                             border: '1px solid rgba(99,102,241,0.15)',
@@ -261,29 +267,29 @@ export default function UserLayout({ children }) {
                                 exit={{ rotate: 90, opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+                                {sidebarOpen && !isMobile ? <X size={18} /> : <Menu size={18} />}
                             </motion.div>
                         </AnimatePresence>
                     </motion.button>
 
-                    {/* Breadcrumb / page indicator */}
+                    {/* Breadcrumb */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full"
                                 style={{ background: 'linear-gradient(135deg, #6366f1, #7c3aed)' }} />
-                            <span className="text-xs font-semibold" style={{ color: '#6366f1' }}>
+                            <span className="text-xs font-semibold hidden sm:block" style={{ color: '#6366f1' }}>
                                 Portal Peserta
                             </span>
                         </div>
                         <p className="text-sm font-black text-gray-800 truncate leading-tight">
-                            Selamat datang, {user?.name?.split(' ')[0]} 👋
+                            Halo, {user?.name?.split(' ')[0]} 👋
                         </p>
                     </div>
 
                     {/* Avatar */}
                     <motion.div
                         whileHover={{ scale: 1.05 }}
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm shrink-0 cursor-pointer"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-sm shrink-0 cursor-pointer"
                         style={{
                             background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
                             boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
@@ -295,7 +301,7 @@ export default function UserLayout({ children }) {
                 </motion.header>
 
                 {/* ── Page content ── */}
-                <main className="flex-1 overflow-auto p-6 md:p-8">
+                <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}

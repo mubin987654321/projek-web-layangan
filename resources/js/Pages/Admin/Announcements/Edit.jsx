@@ -7,62 +7,34 @@ import {
     AlertTriangle, Pencil
 } from 'lucide-react';
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.45 } }
-};
-
 const inputClass =
-    "w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm bg-slate-50 " +
-    "focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white " +
-    "placeholder:text-slate-400 transition-all";
+    "w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 placeholder:text-gray-300 focus:outline-none";
 
-const labelClass =
-    "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1";
+const labelClass = "block text-xs font-bold uppercase tracking-wider mb-1.5";
 
 const TYPE_OPTS = [
-    { value: 'info', label: 'Info', icon: Info, active: 'bg-indigo-100 text-indigo-700 border-indigo-300' },
-    { value: 'winner', label: 'Pemenang', icon: Trophy, active: 'bg-amber-100 text-amber-700 border-amber-300' },
-    { value: 'update', label: 'Update', icon: RefreshCw, active: 'bg-blue-100 text-blue-700 border-blue-300' },
-    { value: 'warning', label: 'Peringatan', icon: AlertTriangle, active: 'bg-red-100 text-red-700 border-red-300' },
+    { value: 'info',    label: 'Info',       icon: Info,          color: '#4f46e5', bg: 'rgba(99,102,241,0.12)',  active: 'rgba(99,102,241,0.2)',  border: 'rgba(99,102,241,0.4)'  },
+    { value: 'winner',  label: 'Pemenang',   icon: Trophy,        color: '#b45309', bg: 'rgba(245,158,11,0.12)', active: 'rgba(245,158,11,0.2)',  border: 'rgba(245,158,11,0.4)'  },
+    { value: 'update',  label: 'Update',     icon: RefreshCw,     color: '#1d4ed8', bg: 'rgba(59,130,246,0.12)', active: 'rgba(59,130,246,0.2)',  border: 'rgba(59,130,246,0.4)'  },
+    { value: 'warning', label: 'Peringatan', icon: AlertTriangle, color: '#dc2626', bg: 'rgba(239,68,68,0.12)',  active: 'rgba(239,68,68,0.2)',   border: 'rgba(239,68,68,0.4)'   },
 ];
 
 function FieldError({ msg }) {
     if (!msg) return null;
     return (
-        <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-            <Info className="w-3 h-3" /> {msg}
+        <p className="flex items-center gap-1 text-red-500 text-xs mt-1.5 font-medium">
+            <Info className="w-3 h-3 shrink-0" /> {msg}
         </p>
     );
 }
 
-function SectionCard({ icon: Icon, title, children }) {
-    return (
-        <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden"
-        >
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50">
-                <div className="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-indigo-600" />
-                </div>
-                <h2 className="font-bold text-slate-800">{title}</h2>
-            </div>
-            <div className="p-6">{children}</div>
-        </motion.div>
-    );
-}
-
 export default function AnnouncementsEdit({ announcement, events = [] }) {
-
     const { data, setData, patch, processing, errors } = useForm({
-        event_id: announcement.event_id || '',
-        title: announcement.title || '',
-        content: announcement.content || '',
-        type: announcement.type || 'info',
-        is_published: announcement.is_published || false,
+        event_id:     announcement.event_id     ?? '',
+        title:        announcement.title        ?? '',
+        content:      announcement.content      ?? '',
+        type:         announcement.type         ?? 'info',
+        is_published: announcement.is_published ?? false,
     });
 
     function submit(e) {
@@ -74,172 +46,288 @@ export default function AnnouncementsEdit({ announcement, events = [] }) {
         <AdminLayout header="Edit Pengumuman">
             <Head title="Edit Pengumuman" />
 
-            {/* HERO */}
+            {/* ── Hero Banner ── */}
             <motion.div
-                initial={{ opacity: 0, y: -16 }}
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-indigo-600 to-blue-600 text-white 
-                           rounded-3xl p-6 mb-8 shadow-lg"
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="relative overflow-hidden rounded-3xl mb-6 sm:mb-8"
+                style={{
+                    background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+                    boxShadow: '0 25px 60px -10px rgba(79,70,229,0.5)',
+                }}
             >
-                <div className="flex justify-between items-center">
-                    <div>
-                        <p className="text-indigo-200 text-sm flex items-center gap-1">
-                            <Pencil className="w-4 h-4" />
-                            Panel Admin
-                        </p>
-                        <h1 className="text-2xl font-black mt-1">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20"
+                        style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }} />
+                    <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full opacity-15"
+                        style={{ background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)' }} />
+                    <svg className="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
+                        <defs><pattern id="gridEdit" width="32" height="32" patternUnits="userSpaceOnUse">
+                            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeWidth="0.5"/>
+                        </pattern></defs>
+                        <rect width="100%" height="100%" fill="url(#gridEdit)"/>
+                    </svg>
+                </div>
+
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 sm:p-8">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                                <Pencil className="w-3.5 h-3.5 text-indigo-300" />
+                                <span className="text-indigo-200 text-xs font-semibold tracking-wide uppercase">Panel Administrator</span>
+                            </div>
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight"
+                            style={{ textShadow: '0 0 40px rgba(129,140,248,0.6)' }}>
                             Edit Pengumuman ✏️
                         </h1>
-                        <p className="text-sm text-indigo-200 mt-1 truncate max-w-md">
+                        <p className="text-indigo-200/80 text-sm mt-1 truncate max-w-sm sm:max-w-md">
                             {announcement.title}
                         </p>
+
+                        {/* Status chip — visible on mobile below title */}
+                        <div className="flex items-center gap-2 mt-3 sm:hidden">
+                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+                                style={data.is_published
+                                    ? { background: 'rgba(16,185,129,0.2)', color: '#6ee7b7', border: '1px solid rgba(16,185,129,0.3)' }
+                                    : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                                <span className="w-1.5 h-1.5 rounded-full"
+                                    style={{ background: data.is_published ? '#10b981' : '#9ca3af' }} />
+                                {data.is_published ? 'Sedang Tayang' : 'Draft'}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold
-                        ${data.is_published ? 'bg-emerald-500/20 text-emerald-200' : 'bg-white/20 text-white'}`}>
-                        <span className={`w-2 h-2 rounded-full ${data.is_published ? 'bg-emerald-400' : 'bg-gray-300'}`} />
-                        {data.is_published ? 'Published' : 'Draft'}
+                    {/* Status chip desktop + animated icon */}
+                    <div className="hidden sm:flex items-center gap-4 shrink-0">
+                        <span className="flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-bold"
+                            style={data.is_published
+                                ? { background: 'rgba(16,185,129,0.2)', color: '#6ee7b7', border: '1px solid rgba(16,185,129,0.3)' }
+                                : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                            <span className="w-2 h-2 rounded-full"
+                                style={{ background: data.is_published ? '#10b981' : '#9ca3af' }} />
+                            {data.is_published ? 'Sedang Tayang' : 'Draft'}
+                        </span>
+
+                        <motion.div
+                            animate={{ rotate: [0, 6, -4, 0], y: [0, -8, 0] }}
+                            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                            className="hidden md:flex items-center justify-center w-20 h-20 rounded-3xl text-4xl"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(124,58,237,0.2))',
+                                boxShadow: '0 8px 32px rgba(99,102,241,0.3), inset 0 0 0 1px rgba(255,255,255,0.1)',
+                                backdropFilter: 'blur(12px)',
+                            }}
+                        >
+                            ✏️
+                        </motion.div>
                     </div>
                 </div>
             </motion.div>
 
-            <form onSubmit={submit} className="max-w-2xl space-y-6">
+            {/* ── Form ── */}
+            <form onSubmit={submit} className="max-w-2xl space-y-5">
 
-                <SectionCard icon={Megaphone} title="Detail Pengumuman">
-
-                    <div className="space-y-5">
-
-                        {/* EVENT */}
+                {/* Section Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    className="rounded-3xl overflow-hidden"
+                    style={{
+                        background: 'white',
+                        boxShadow: '0 4px 24px -4px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.05)',
+                        border: '1px solid rgba(99,102,241,0.12)',
+                    }}
+                >
+                    {/* Card Header */}
+                    <div className="flex items-center gap-3 px-4 sm:px-6 py-4"
+                        style={{
+                            borderBottom: '1px solid rgba(99,102,241,0.1)',
+                            background: 'linear-gradient(to right, rgba(238,242,255,0.8), rgba(245,243,255,0.5))',
+                        }}>
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: 'linear-gradient(135deg, #6366f1, #7c3aed)', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                            <Megaphone className="w-4 h-4 text-white" />
+                        </div>
                         <div>
-                            <label className={labelClass}>
-                                <CalendarDays className="w-3 h-3" />
-                                Event
-                            </label>
+                            <h2 className="font-bold text-gray-800 text-sm">Detail Pengumuman</h2>
+                            <p className="text-xs text-gray-400">Ubah informasi pengumuman</p>
+                        </div>
+                    </div>
 
+                    <div className="p-4 sm:p-6 space-y-5">
+
+                        {/* Event */}
+                        <div>
+                            <label className={labelClass} style={{ color: '#6366f1' }}>
+                                <span className="flex items-center gap-1">
+                                    <CalendarDays className="w-3 h-3" /> Event
+                                </span>
+                            </label>
                             <select
                                 className={inputClass}
                                 value={data.event_id}
                                 onChange={e => setData('event_id', e.target.value)}
+                                style={{ border: '1px solid rgba(99,102,241,0.2)', background: 'rgba(248,249,255,0.8)' }}
+                                onFocus={e => e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)'}
+                                onBlur={e => e.target.style.boxShadow = 'none'}
                             >
-                                <option value="">Pilih Event</option>
+                                <option value="">-- Pilih Event --</option>
                                 {events.map(ev => (
                                     <option key={ev.id} value={ev.id}>{ev.title}</option>
                                 ))}
                             </select>
-
                             <FieldError msg={errors.event_id} />
                         </div>
 
-                        {/* TITLE */}
+                        {/* Judul */}
                         <div>
-                            <label className={labelClass}>
-                                <FileText className="w-3 h-3" />
-                                Judul
+                            <label className={labelClass} style={{ color: '#6366f1' }}>
+                                <span className="flex items-center gap-1">
+                                    <FileText className="w-3 h-3" /> Judul Pengumuman *
+                                </span>
                             </label>
-
                             <input
                                 className={inputClass}
                                 value={data.title}
                                 onChange={e => setData('title', e.target.value)}
                                 placeholder="Judul pengumuman..."
+                                style={{ border: '1px solid rgba(99,102,241,0.2)', background: 'rgba(248,249,255,0.8)' }}
+                                onFocus={e => e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)'}
+                                onBlur={e => e.target.style.boxShadow = 'none'}
                             />
-
                             <FieldError msg={errors.title} />
                         </div>
 
-                        {/* CONTENT */}
+                        {/* Isi */}
                         <div>
-                            <label className={labelClass}>
-                                <FileText className="w-3 h-3" />
-                                Isi
+                            <label className={labelClass} style={{ color: '#6366f1' }}>
+                                <span className="flex items-center gap-1">
+                                    <FileText className="w-3 h-3" /> Isi Pengumuman *
+                                </span>
                             </label>
-
                             <textarea
-                                rows={5}
                                 className={inputClass}
+                                rows={5}
                                 value={data.content}
                                 onChange={e => setData('content', e.target.value)}
                                 placeholder="Isi pengumuman..."
+                                style={{ border: '1px solid rgba(99,102,241,0.2)', background: 'rgba(248,249,255,0.8)', resize: 'vertical' }}
+                                onFocus={e => e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)'}
+                                onBlur={e => e.target.style.boxShadow = 'none'}
                             />
-
                             <FieldError msg={errors.content} />
                         </div>
 
-                        {/* TYPE */}
+                        {/* Tipe */}
                         <div>
-                            <label className={labelClass}>
-                                <Tag className="w-3 h-3" />
-                                Tipe
+                            <label className={labelClass} style={{ color: '#6366f1' }}>
+                                <span className="flex items-center gap-1">
+                                    <Tag className="w-3 h-3" /> Tipe Pengumuman *
+                                </span>
                             </label>
-
-                            <div className="flex gap-2 flex-wrap">
+                            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                                 {TYPE_OPTS.map(opt => {
-                                    const Icon = opt.icon;
-                                    const active = data.type === opt.value;
-
+                                    const Icon     = opt.icon;
+                                    const isActive = data.type === opt.value;
                                     return (
-                                        <label key={opt.value}
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold cursor-pointer
-                                            ${active ? opt.active : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}>
-                                            
-                                            <input
-                                                type="radio"
-                                                value={opt.value}
-                                                checked={active}
+                                        <motion.label
+                                            key={opt.value}
+                                            whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                            className="flex items-center justify-center sm:justify-start gap-2
+                                                       px-3 sm:px-4 py-2.5 rounded-2xl border-2 cursor-pointer
+                                                       text-xs sm:text-sm font-bold transition-all duration-200"
+                                            style={{
+                                                background: isActive ? opt.active : 'transparent',
+                                                borderColor: isActive ? opt.border : 'rgba(99,102,241,0.12)',
+                                                color: isActive ? opt.color : '#9ca3af',
+                                            }}
+                                        >
+                                            <input type="radio" name="type" value={opt.value}
+                                                checked={isActive}
                                                 onChange={() => setData('type', opt.value)}
-                                                className="hidden"
-                                            />
-
-                                            <Icon className="w-3.5 h-3.5" />
+                                                className="hidden" />
+                                            <Icon className="w-3.5 h-3.5 shrink-0" />
                                             {opt.label}
-                                        </label>
+                                        </motion.label>
                                     );
                                 })}
                             </div>
                         </div>
 
-                        {/* PUBLISH */}
-                        <div className="flex items-center gap-4 pt-4 border-t">
-
+                        {/* Publish toggle */}
+                        <div className="flex items-center gap-4 pt-4"
+                            style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}>
                             <button
                                 type="button"
                                 onClick={() => setData('is_published', !data.is_published)}
-                                className={`w-12 h-6 rounded-full flex items-center px-1 transition
-                                    ${data.is_published ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                                className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none shrink-0"
+                                style={{ background: data.is_published ? '#6366f1' : '#d1d5db' }}
                             >
-                                <div className={`w-4 h-4 bg-white rounded-full shadow transition
-                                    ${data.is_published ? 'translate-x-6' : ''}`} />
+                                <motion.span
+                                    layout
+                                    className="inline-block h-5 w-5 rounded-full bg-white shadow-md"
+                                    animate={{ x: data.is_published ? 22 : 4 }}
+                                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                />
                             </button>
-
-                            <span className="text-sm font-semibold text-slate-600">
-                                {data.is_published ? 'Dipublikasikan' : 'Draft'}
-                            </span>
-
+                            <div>
+                                <p className="text-sm font-bold text-gray-700">
+                                    {data.is_published ? '✅ Langsung tayangkan' : 'Simpan sebagai draft'}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-0.5 hidden sm:block">
+                                    {data.is_published
+                                        ? 'Peserta akan langsung melihat pengumuman ini'
+                                        : 'Pengumuman tidak akan terlihat oleh peserta'}
+                                </p>
+                            </div>
                         </div>
 
                     </div>
-                </SectionCard>
+                </motion.div>
 
-                {/* ACTION */}
-                <div className="flex gap-3">
-
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition"
+                {/* ── Action Buttons ── */}
+                <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-col sm:flex-row gap-3 pb-6 sm:pb-8"
+                >
+                    <motion.button
+                        type="submit" disabled={processing}
+                        whileHover={!processing ? { y: -2 } : {}}
+                        whileTap={!processing ? { scale: 0.97 } : {}}
+                        className="flex items-center justify-center gap-2 text-white px-6 py-3 rounded-2xl
+                                   font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed
+                                   transition-all duration-200 w-full sm:w-auto"
+                        style={{
+                            background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                            boxShadow: processing ? 'none' : '0 6px 20px -4px rgba(99,102,241,0.5)',
+                        }}
                     >
-                        {processing ? 'Menyimpan...' : 'Simpan'}
-                        <Save className="w-4 h-4" />
-                    </button>
+                        {processing ? (
+                            <>
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Menyimpan...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4" />
+                                Simpan Perubahan
+                            </>
+                        )}
+                    </motion.button>
 
                     <Link
                         href={route('admin.announcements.index')}
-                        className="px-6 py-3 border rounded-2xl text-sm font-semibold text-slate-600 hover:text-red-500"
+                        className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm
+                                   font-bold text-gray-500 bg-white hover:-translate-y-0.5 transition-all
+                                   duration-200 w-full sm:w-auto"
+                        style={{ border: '1px solid rgba(99,102,241,0.15)' }}
                     >
-                        Batal
+                        <X className="w-4 h-4" /> Batal
                     </Link>
-
-                </div>
+                </motion.div>
 
             </form>
         </AdminLayout>

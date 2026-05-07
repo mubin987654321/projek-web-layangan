@@ -40,16 +40,16 @@ class UserSeeder extends Seeder
 
         // Peserta
         $participants = [
-            ['name' => 'Andi Pratama',   'email' => 'peserta1@kite.test'],
-            ['name' => 'Dewi Lestari',   'email' => 'peserta2@kite.test'],
-            ['name' => 'Rizky Fauzan',   'email' => 'peserta3@kite.test'],
-            ['name' => 'Sari Wahyuni',   'email' => 'peserta4@kite.test'],
-            ['name' => 'Bagas Kurniawan', 'email' => 'peserta5@kite.test'],
-            ['name' => 'Fajar Nugroho',  'email' => 'peserta6@kite.test'],
-            ['name' => 'Nina Oktaviani', 'email' => 'peserta7@kite.test'],
-            ['name' => 'Putra Mahendra', 'email' => 'peserta8@kite.test'],
-            ['name' => 'Yuni Kartika',   'email' => 'peserta9@kite.test'],
-            ['name' => 'Rama Saputra',   'email' => 'peserta10@kite.test'],
+            ['name' => 'Andi Pratama',   'email' => 'peserta1@gmail.com'],
+            ['name' => 'Dewi Lestari',   'email' => 'peserta2@gmail.com'],
+            ['name' => 'Rizky Fauzan',   'email' => 'peserta3@gmail.com'],
+            ['name' => 'Sari Wahyuni',   'email' => 'peserta4@gmail.com'],
+            ['name' => 'Bagas Kurniawan', 'email' => 'peserta5@gmail.com'],
+            ['name' => 'Fajar Nugroho',  'email' => 'peserta6@gmail.com'],
+            ['name' => 'Nina Oktaviani', 'email' => 'peserta7@gmail.com'],
+            ['name' => 'Putra Mahendra', 'email' => 'peserta8@gmail.com'],
+            ['name' => 'Yuni Kartika',   'email' => 'peserta9@gmail.com'],
+            ['name' => 'Rama Saputra',   'email' => 'peserta10@gmail.com'],
         ];
 
         foreach ($participants as $p) {
