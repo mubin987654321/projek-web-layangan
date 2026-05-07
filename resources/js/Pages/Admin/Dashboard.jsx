@@ -250,10 +250,11 @@ export default function Dashboard({ stats, recentEvents, pendingRegistrations })
                                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                                 className="text-4xl sm:text-5xl mb-3 sm:mb-4"
                             >
-                                ✅
+                                
                             </motion.div>
-                            <p className="text-gray-800 font-semibold text-sm">Semua Sudah Ditangani</p>
+                            <p className="text-gray-800 font-semibold text-sm">Sudah Disetujui Semua</p>
                             <p className="text-gray-400 text-xs mt-1">
+                                
                                 Tidak ada pendaftaran yang menunggu persetujuan.
                             </p>
                         </motion.div>

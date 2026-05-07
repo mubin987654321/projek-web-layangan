@@ -110,7 +110,7 @@ export default function RegistrationsIndex({ registrations }) {
             {/* ── STAT CARDS ── */}
             {registrations.length > 0 && (
                 <motion.div initial="hidden" animate="show" variants={stagger}
-                    className="grid grid-cols-3 gap-4 mb-8">
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {stats.map((s, i) => (
                         <motion.div key={i} variants={fadeUp}>
                             <TiltCard intensity={12} className="group">
